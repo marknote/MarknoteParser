@@ -1,3 +1,3 @@
 # MarkNote Parser
 
-a high performance markdown parser implemented in Swift.
+A high performance markdown parser implemented in Swift.
