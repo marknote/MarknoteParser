@@ -12,7 +12,7 @@ After trying to find a relevant markdown parser in Swfit/Object-c while no resul
 
 Use the method MarkNoteParser.toHtml to convert markdown text to HTML string, like this:
 
-```
+```swift
 func markdown(input :String)->String{
         let result = MarkNoteParser.toHtml(input)
         println("input: \(input) result:\(result)")
@@ -29,7 +29,8 @@ I am still heavily working on it.
 ### Features has implemented
 
 The following test cases have been passed:
-```
+
+```swift
 func testHeading() {
         XCTAssertEqual("<h1>Hello</h1>", markdown("# Hello"), "H1 Heading Pass")
         XCTAssertEqual("<h2>Hello</h2>", markdown("## Hello"), "H2 Heading Pass")
