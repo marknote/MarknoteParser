@@ -28,6 +28,10 @@ public class MarkNoteParser: NSObject {
         
         for rawline in lines {
             let line = rawline.trim()
+            if line.length == 0 {
+                // empty line
+                continue
+            }
             if !isInCodeBlock && line.indexOf("```") == 0 {
                 isInCodeBlock = true
                 output += "<code>"
@@ -48,10 +52,7 @@ public class MarkNoteParser: NSObject {
         }
     }
     
-    func handleLine(line:String) {
-        //line = line.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-        // detect heads
-        //var bHead = [Bool]()
+    func calculateHeadLevel(line:String)->Int{
         var nFindHead = 0
         var pos: String.Index = line.startIndex
         for var i = 0; i <= 6 && i < count(line); i++ {
@@ -62,54 +63,50 @@ public class MarkNoteParser: NSObject {
                 break;
             }
         }
-        addHeadBegin(nFindHead)
-        //output += line.substringFromIndex(pos).trim()
-        //line = this.handleImage(line, sb);
-        //line = handleKey(line.substring(nFindHead), sb);
-        //handleBold(line.substringFromIndex(pos).trim())
+        return nFindHead
+    }
+    
+    func handleLine(rawline:String) {
+        var line = rawline
+        var endTags = [String]()
+        
+        var pos: String.Index = line.startIndex
+        
+        if line[0] == ">" {
+            output += "<blockquote>"
+            line = line.substringFromIndex(advance(line.startIndex,">".length))
+            endTags.append("</blockquote>")
+        }
+        
+        var nFindHead = calculateHeadLevel(line)
+        if (nFindHead > 0) {
+            output  += "<h\(nFindHead)>"
+            endTags.append("</h\(nFindHead)>")
+            pos = advance(pos, nFindHead)
+        }
+     
+        //line = this.handleImage(line, sb)
+        
         var remaining = line.substringFromIndex(pos).trim()
-        remaining = handleTag(remaining, tag: "**", replace: "strong")
-        remaining = handleTag(remaining, tag: "__", replace: "strong")
-        remaining = handleTag(remaining, tag: "*", replace: "em")
-        remaining = handleTag(remaining, tag: "_", replace: "em")
-        remaining = handleTag(remaining, tag: "`", replace: "code")
+        remaining = handleTagPair(remaining, tag: "**", replace: "strong")
+        remaining = handleTagPair(remaining, tag: "__", replace: "strong")
+        remaining = handleTagPair(remaining, tag: "*", replace: "em")
+        remaining = handleTagPair(remaining, tag: "_", replace: "em")
+        remaining = handleTagPair(remaining, tag: "`", replace: "code")
         output += remaining
         
-        addHeadEnd(nFindHead)
-    }
-
-
-
-    func addHeadBegin(nHeadLevel:Int) {
-        // add head begin
-        if (nHeadLevel > 0) {
-            if nCurrentBulletLevel > 0  {
-                for i in 0...(nCurrentBulletLevel-1) {
-                    output  += "</ul>"
-                }
-            }
-            self.nCurrentBulletLevel = 0
-            output  += "<h\(nHeadLevel)>"
-        }
-        
-    }
-    
-    func addHeadEnd(nHeadLevel:Int) {
-        // add head end
-        if nHeadLevel > 0 {
-            output += "</h\(nHeadLevel)>"
+        for var i = endTags.count - 1; i >= 0; i-- {
+            output += endTags[i]
         }
     }
     
-    
-    func handleTag(input:String,tag:String, replace:String )->String {
+    func handleTagPair(input:String,tag:String, replace:String )->String {
         var linepart = input.trim()
         var nBegin = linepart.indexOf(tag)
         let tagLenth = tag.length
         
         var nEnd = 0
-        if (nBegin >= 0) {
-            
+        if (nBegin >= 0) {            
             nEnd = linepart
                 .substringFromIndex(advance(linepart.startIndex, nBegin + tagLenth))
                 .indexOf(tag)
@@ -123,7 +120,7 @@ public class MarkNoteParser: NSObject {
                 output += "</\(replace)>"
                 if nEnd < linepart.length - tag.length {
                     var remaining = linepart.substringFromIndex( advance( linepart.startIndex, nBegin + tagLenth + nEnd + tagLenth))
-                    return handleTag(
+                    return handleTagPair(
                         remaining,
                         tag:tag,
                         replace:replace
