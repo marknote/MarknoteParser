@@ -26,8 +26,9 @@ public class MarkNoteParser: NSObject {
         let lines = split(preProceeded){$0 == "\n"}
         var isInCodeBlock:Bool = false
         
-        for rawline in lines {
-            let line = rawline.trim()
+        //for rawline in lines {
+        for var i = 0; i < lines.count; i++ {
+            let line = lines[i].trim()
             if line.length == 0 {
                 // empty line
                 continue
@@ -39,7 +40,20 @@ public class MarkNoteParser: NSObject {
             }
             
             if !isInCodeBlock {
+                if i + 1 <= lines.count - 1 {
+                    let nextLine = lines[i + 1].trim()
+                    if nextLine.contains3PlusandOnlyChars("="){
+                            output += "<h1>" + line + "</h1>\n"
+                            i++
+                            continue
+                    } else if nextLine.contains3PlusandOnlyChars("-"){
+                            output += "<h2>" + line + "</h2>\n"
+                            i++
+                            continue                            
+                    }
+                }
                 handleLine(line)
+                
             } else {
                 if line.indexOf("```") == 0 {
                     isInCodeBlock = false
@@ -51,6 +65,8 @@ public class MarkNoteParser: NSObject {
             }
         }
     }
+    
+    
     
     func calculateHeadLevel(line:String)->Int{
         var nFindHead = 0
@@ -67,6 +83,12 @@ public class MarkNoteParser: NSObject {
     }
     
     func handleLine(rawline:String) {
+        if rawline.contains3PlusandOnlyChars("-")
+        || rawline.contains3PlusandOnlyChars("*")
+        || rawline.contains3PlusandOnlyChars("_"){
+            output += "<hr>\n"
+            return
+        }
         var line = rawline
         var endTags = [String]()
         
@@ -88,53 +110,80 @@ public class MarkNoteParser: NSObject {
         //line = this.handleImage(line, sb)
         
         var remaining = line.substringFromIndex(pos).trim()
-        remaining = handleTagPair(remaining, tag: "**", replace: "strong")
+        /*remaining = handleTagPair(remaining, tag: "**", replace: "strong")
         remaining = handleTagPair(remaining, tag: "__", replace: "strong")
         remaining = handleTagPair(remaining, tag: "*", replace: "em")
         remaining = handleTagPair(remaining, tag: "_", replace: "em")
-        remaining = handleTagPair(remaining, tag: "`", replace: "code")
-        output += remaining
+        remaining = handleTagPair(remaining, tag: "`", replace: "code")*/
+        //output += remaining
+        parseInLine(remaining)
         
         for var i = endTags.count - 1; i >= 0; i-- {
             output += endTags[i]
         }
     }
     
-    func handleTagPair(input:String,tag:String, replace:String )->String {
-        var linepart = input.trim()
-        var nBegin = linepart.indexOf(tag)
-        let tagLenth = tag.length
-        
-        var nEnd = 0
-        if (nBegin >= 0) {            
-            nEnd = linepart
-                .substringFromIndex(advance(linepart.startIndex, nBegin + tagLenth))
-                .indexOf(tag)
-            if (nEnd > nBegin) {
-                // tag found
-                if nBegin > tag.length {
-                    output += linepart.substring(0, end:nBegin - tagLenth)
+    func parseInLine(line: String) {
+        let len = line.length
+        let start = line.startIndex
+        for var i = 0; i < len ; i++ {
+            let ch = line[advance(start, i)]
+            
+            
+            switch ch {
+            case "*":
+                if (i + 1 > len - 1) {
+                    output.append(ch)
+                    return
                 }
-                output += "<\(replace)>"
-                output += linepart.substring(nBegin + tagLenth, end: nEnd + nBegin + tagLenth - 1)
-                output += "</\(replace)>"
-                if nEnd < linepart.length - tag.length {
-                    var remaining = linepart.substringFromIndex( advance( linepart.startIndex, nBegin + tagLenth + nEnd + tagLenth))
-                    return handleTagPair(
-                        remaining,
-                        tag:tag,
-                        replace:replace
-                    )
+                if line[advance(start, i + 1)] == "*" {
+                    //possible **
+                    
+                    let remaining = line.substringFromIndex(advance(start, i + 2))
+                    i += scanClosedChar("**",inStr: remaining,tag: "strong") + 1
                 } else {
-                    return ""
+                    let remaining = line.substringFromIndex(advance(start, i + 1))
+                    i += scanClosedChar("*",inStr: remaining,tag: "em")
                 }
-            } else {
-                return linepart
+
+            case "_":
+                if (i + 1 > len - 1) {
+                    self.output.append(ch)
+                    return 
+                }
+                if line[advance(start, i + 1)] == "_" {
+                    //possible __
+                    let remaining = line.substringFromIndex(advance(start, i + 2))
+                    i += scanClosedChar("__",inStr: remaining,tag: "strong") + 1
+
+                } else {
+                    let remaining = line.substringFromIndex(advance(start, i + 1))
+                    i += scanClosedChar("_",inStr: remaining,tag: "em")
+                }
+            case "`":
+                let remaining = line.substringFromIndex(advance(start, i + 1))
+               
+                i += scanClosedChar("`",inStr: remaining,tag: "code")
+            default:
+                //do nothing
+                output.append(ch)
             }
-        } else {
-            return linepart
-        }
         
+        }
     }
+    
+    func scanClosedChar(ch:String, inStr:String,tag:String) -> Int {
+        
+        let pos = inStr.indexOf(ch)
+        if pos > 0 {
+            output += "<\(tag)>" + inStr.substringToIndex(advance(inStr.startIndex,  pos )) + "</\(tag)>"
+            
+        } else {
+            output += ch
+        }
+        return pos + ch.length 
+    }
+    
+  
    
 }

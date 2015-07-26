@@ -285,7 +285,7 @@ extension String {
     }
     
     func substring(begin:Int, end:Int)->String{
-        let range:NSRange = NSMakeRange(begin, end - begin + 1 )
+        let range:NSRange = NSMakeRange(begin, end - begin )
         return self[range]
     }
     
@@ -320,5 +320,11 @@ extension String {
         } else {
             return -1
         }
+    }
+    
+    func contains3PlusandOnlyChars( char:String)-> Bool{
+        return self.length >= 3
+            && self.indexOf(char) == 0
+            && self.stringByReplacingOccurrencesOfString(char, withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil).length == 0
     }
 }
