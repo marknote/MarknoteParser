@@ -285,7 +285,7 @@ extension String {
     }
     
     func substring(begin:Int, end:Int)->String{
-        let range:NSRange = NSMakeRange(begin, end - begin )
+        let range:NSRange = NSMakeRange(begin, end - begin + 1 )
         return self[range]
     }
     
@@ -326,5 +326,9 @@ extension String {
         return self.length >= 3
             && self.indexOf(char) == 0
             && self.stringByReplacingOccurrencesOfString(char, withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil).length == 0
+    }
+    
+    func replaceAll(target:String, toStr: String)->String{
+        return self.stringByReplacingOccurrencesOfString(target, withString: toStr, options: NSStringCompareOptions.LiteralSearch, range: nil)
     }
 }

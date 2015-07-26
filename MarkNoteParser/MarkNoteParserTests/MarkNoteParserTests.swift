@@ -89,7 +89,15 @@ class MarkNoteParserTests: XCTestCase {
         XCTAssertEqual("123<em>World</em>456", markdown("123_World_456"), "Emphasis Underscope Pass")
         XCTAssertEqual("123<em>Hello</em>456123<em>world</em>456", markdown("123*Hello*456123*world*456"), "Emphasis Asterisk Pass")
         XCTAssertEqual("123<em>World</em>456123<em>world</em>456", markdown("123_World_456123*world*456"), "Emphasis Underscope Pass")
-    } 
+    }
+    
+    func testBulletList()
+    {
+        let input = "A bulleted list:\n- a\n- b\n- c\n"
+        let expected = "A bulleted list:<ul><li>a</li><li>b</li><li>c</li></ul>"
+        let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
+        XCTAssertEqual(expected, actual)
+    }
 
     
 }

@@ -25,36 +25,13 @@ public class MarkNoteParser: NSObject {
         var preProceeded = input.stringByReplacingOccurrencesOfString("\r\n", withString:"\n", options: NSStringCompareOptions.LiteralSearch, range: nil)
         let lines = split(preProceeded){$0 == "\n"}
         var isInCodeBlock:Bool = false
+        var blockEndTags = [String]()
         
         //for rawline in lines {
         for var i = 0; i < lines.count; i++ {
             let line = lines[i].trim()
-            if line.length == 0 {
-                // empty line
-                continue
-            }
-            if !isInCodeBlock && line.indexOf("```") == 0 {
-                isInCodeBlock = true
-                output += "<code>"
-                continue // ignor current line
-            }
             
-            if !isInCodeBlock {
-                if i + 1 <= lines.count - 1 {
-                    let nextLine = lines[i + 1].trim()
-                    if nextLine.contains3PlusandOnlyChars("="){
-                            output += "<h1>" + line + "</h1>\n"
-                            i++
-                            continue
-                    } else if nextLine.contains3PlusandOnlyChars("-"){
-                            output += "<h2>" + line + "</h2>\n"
-                            i++
-                            continue                            
-                    }
-                }
-                handleLine(line)
-                
-            } else {
+            if isInCodeBlock {
                 if line.indexOf("```") == 0 {
                     isInCodeBlock = false
                     output += "</code>"
@@ -62,7 +39,58 @@ public class MarkNoteParser: NSObject {
                 }else {
                     output += line
                 }
+            } else {
+                // not in block
+                if  line.length == 0 {
+                    // empty line
+                    for var i = blockEndTags.count - 1; i >= 0; i-- {
+                        output += blockEndTags[i]
+                    }
+                    blockEndTags.removeAll(keepCapacity: false)
+                    continue
+                }
+                
+                if line.indexOf("- ") == 0 {
+                    if self.nCurrentBulletLevel == 0 {
+                        output += "<ul>\n"
+                        blockEndTags.append("</ul>\n")
+                        self.nCurrentBulletLevel = 1
+                    }
+                    output += "<li>"
+                    let newline = line.substring("- ".length, end: line.length - 1)
+                    handleLine(newline)
+                    output += "</li>\n"
+                    continue
+                } else {
+                    if self.nCurrentBulletLevel > 0 {
+                        self.nCurrentBulletLevel = 0
+                        output += "</ul>\n"
+                    }
+                }
+                
+                if  line.indexOf("```") == 0 {
+                    isInCodeBlock = true
+                    output += "<code>"
+                    continue // ignor current line
+                }
+
+                if i + 1 <= lines.count - 1 {
+                    let nextLine = lines[i + 1].trim()
+                    if nextLine.contains3PlusandOnlyChars("="){
+                        output += "<h1>" + line + "</h1>\n"
+                        i++
+                        continue
+                    } else if nextLine.contains3PlusandOnlyChars("-"){
+                        output += "<h2>" + line + "</h2>\n"
+                        i++
+                        continue
+                    }
+                }
+                handleLine(line)
             }
+        }//end for
+        for var i = blockEndTags.count - 1; i >= 0; i-- {
+            output += blockEndTags[i]
         }
     }
     
@@ -110,17 +138,12 @@ public class MarkNoteParser: NSObject {
         //line = this.handleImage(line, sb)
         
         var remaining = line.substringFromIndex(pos).trim()
-        /*remaining = handleTagPair(remaining, tag: "**", replace: "strong")
-        remaining = handleTagPair(remaining, tag: "__", replace: "strong")
-        remaining = handleTagPair(remaining, tag: "*", replace: "em")
-        remaining = handleTagPair(remaining, tag: "_", replace: "em")
-        remaining = handleTagPair(remaining, tag: "`", replace: "code")*/
-        //output += remaining
         parseInLine(remaining)
         
         for var i = endTags.count - 1; i >= 0; i-- {
             output += endTags[i]
         }
+        //output += "\n"
     }
     
     func parseInLine(line: String) {
@@ -172,8 +195,7 @@ public class MarkNoteParser: NSObject {
         }
     }
     
-    func scanClosedChar(ch:String, inStr:String,tag:String) -> Int {
-        
+    func scanClosedChar(ch:String, inStr:String,tag:String) -> Int {        
         let pos = inStr.indexOf(ch)
         if pos > 0 {
             output += "<\(tag)>" + inStr.substringToIndex(advance(inStr.startIndex,  pos )) + "</\(tag)>"
