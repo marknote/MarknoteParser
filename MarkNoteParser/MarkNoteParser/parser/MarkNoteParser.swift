@@ -152,7 +152,6 @@ public class MarkNoteParser: NSObject {
         for var i = 0; i < len ; i++ {
             let ch = line[advance(start, i)]
             
-            
             switch ch {
             case "*":
                 if (i + 1 > len - 1) {
@@ -161,7 +160,6 @@ public class MarkNoteParser: NSObject {
                 }
                 if line[advance(start, i + 1)] == "*" {
                     //possible **
-                    
                     let remaining = line.substringFromIndex(advance(start, i + 2))
                     i += scanClosedChar("**",inStr: remaining,tag: "strong") + 1
                 } else {
@@ -185,8 +183,31 @@ public class MarkNoteParser: NSObject {
                 }
             case "`":
                 let remaining = line.substringFromIndex(advance(start, i + 1))
-               
                 i += scanClosedChar("`",inStr: remaining,tag: "code")
+            case "[":
+                let remaining = line.substringFromIndex(advance(start, i + 1))
+                let pos = remaining.indexOf("]")
+                if  pos >= 0 {
+                    let remaining2 = line.substringFromIndex(advance(start, i + 1 + pos + 1))
+                    let pos1 = remaining2.indexOf("(")
+                    if pos1 >= 0 {
+                        let pos2 = line.substringFromIndex(advance(start, i + 1 + pos + 1 + pos1 + 1)).indexOf(")")
+                        if pos2 >= 0 {
+                            //[title](url)
+                            let title = line.substring(i + 1, end: i + 1 + pos - 1)
+                            let url = line.substring(i + 1 + pos + 1 + pos1 + 1, end: i + 1 + pos + 1 + pos1 + 1 + pos2 - 1)
+                            let posSpace = url.indexOf(" ")
+                            if posSpace > 0 {
+                                let urlBody = url.substring(0, end: posSpace - 1)
+                                let urlTile = url.substringFromIndex(advance(url.startIndex, posSpace + 1))
+                                output += "<a href=\"" + urlBody + "\" title=\"" + urlTile.replaceAll("\"", toStr: "") + "\">" + title + "</a>"
+                            } else {
+                                output += "<a href=\"" + url + "\">" + title + "</a>"
+                            }
+                            i += 1 + pos + 1 + pos1 + 1 + pos2 + 1
+                        }
+                    }
+                }
             default:
                 //do nothing
                 output.append(ch)
@@ -199,7 +220,6 @@ public class MarkNoteParser: NSObject {
         let pos = inStr.indexOf(ch)
         if pos > 0 {
             output += "<\(tag)>" + inStr.substringToIndex(advance(inStr.startIndex,  pos )) + "</\(tag)>"
-            
         } else {
             output += ch
         }

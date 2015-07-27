@@ -48,6 +48,12 @@ class MarkNoteParserTests: XCTestCase {
         XCTAssertEqual("<a href=\"www.google.com\" title=\"GoogleSearch\">Google</a>", markdown("[Google][]\n\n [Google]:www.google.com \"GoogleSearch\"\n"), "Deflink no title Pass")
     }*/
     
+    func testInlineLinks() {
+        XCTAssertEqual("<a href=\"www.google.com\">Google</a>", markdown("[Google](www.google.com)"), "inline link Pass")
+        XCTAssertEqual("<a href=\"www.google.com\" title=\"googlehome\">Google</a>", markdown("[Google](www.google.com \"googlehome\")"), "inline link Pass")
+        
+    }
+    
     func testHRule() {
         XCTAssertEqual("<hr>\n", markdown("-----"), "HRule dashes Pass")
         XCTAssertEqual("<hr>\n", markdown("***"), "HRule asterisks Pass")
