@@ -186,27 +186,19 @@ public class MarkNoteParser: NSObject {
                 i += scanClosedChar("`",inStr: remaining,tag: "code")
             case "[":
                 let remaining = line.substringFromIndex(advance(start, i + 1))
-                let pos = remaining.indexOf("]")
-                if  pos >= 0 {
-                    let remaining2 = line.substringFromIndex(advance(start, i + 1 + pos + 1))
-                    let pos1 = remaining2.indexOf("(")
-                    if pos1 >= 0 {
-                        let pos2 = line.substringFromIndex(advance(start, i + 1 + pos + 1 + pos1 + 1)).indexOf(")")
-                        if pos2 >= 0 {
-                            //[title](url)
-                            let title = line.substring(i + 1, end: i + 1 + pos - 1)
-                            let url = line.substring(i + 1 + pos + 1 + pos1 + 1, end: i + 1 + pos + 1 + pos1 + 1 + pos2 - 1)
-                            let posSpace = url.indexOf(" ")
-                            if posSpace > 0 {
-                                let urlBody = url.substring(0, end: posSpace - 1)
-                                let urlTile = url.substringFromIndex(advance(url.startIndex, posSpace + 1))
-                                output += "<a href=\"" + urlBody + "\" title=\"" + urlTile.replaceAll("\"", toStr: "") + "\">" + title + "</a>"
-                            } else {
-                                output += "<a href=\"" + url + "\">" + title + "</a>"
-                            }
-                            i += 1 + pos + 1 + pos1 + 1 + pos2 + 1
-                        }
+                let posArray = MarkNoteParser.detectPositions(["]","(",")"],inStr: remaining)
+                if posArray.count == 3 {
+                    let title = line.substring(i + 1, end: i + 1 + posArray[0] - 1)
+                    let url = line.substring( i + 1 + posArray[1] + 1, end: i + 1 + posArray[2] - 1)
+                    let posSpace = url.indexOf(" ")
+                    if posSpace > 0 {
+                        let urlBody = url.substring(0, end: posSpace - 1)
+                        let urlTile = url.substringFromIndex(advance(url.startIndex, posSpace + 1))
+                        output += "<a href=\"" + urlBody + "\" title=\"" + urlTile.replaceAll("\"", toStr: "") + "\">" + title + "</a>"
+                    } else {
+                        output += "<a href=\"" + url + "\">" + title + "</a>"
                     }
+                    i +=  posArray[2] + 1
                 }
             default:
                 //do nothing
@@ -216,7 +208,23 @@ public class MarkNoteParser: NSObject {
         }
     }
     
-    func scanClosedChar(ch:String, inStr:String,tag:String) -> Int {        
+    public static func detectPositions(toFind:[String],inStr:String )->[Int]{
+        var posArray = [Int]()
+        let count = toFind.count
+        var lastPos = 0
+        for var i = 0; i < count ; i++ {
+            let pos = inStr.substringFromIndex(advance(inStr.startIndex, lastPos)).indexOf(toFind[i])
+            lastPos += pos 
+            if pos >= 0 {
+                posArray.append(lastPos)
+            }else {
+                return posArray
+            }
+        }
+        return posArray
+    }
+    
+    func  scanClosedChar(ch:String, inStr:String,tag:String) -> Int {
         let pos = inStr.indexOf(ch)
         if pos > 0 {
             output += "<\(tag)>" + inStr.substringToIndex(advance(inStr.startIndex,  pos )) + "</\(tag)>"

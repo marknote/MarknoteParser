@@ -104,6 +104,22 @@ class MarkNoteParserTests: XCTestCase {
         let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
         XCTAssertEqual(expected, actual)
     }
+    
+    
+    func testDetectPositions() {
+        let expected = [1,2,3]
+        let actual = MarkNoteParser.detectPositions(["1","2","3"],inStr:"0123")
+        XCTAssertEqual(expected, actual)
+
+    }
+    
+    func testDetectPositions2() {
+        let expected = [2,4,5]
+        let actual = MarkNoteParser.detectPositions(["2","4","5"],inStr:"012345")
+        XCTAssertEqual(expected, actual)
+        
+    }
+
 
     
 }
