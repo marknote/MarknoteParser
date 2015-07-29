@@ -184,6 +184,20 @@ public class MarkNoteParser: NSObject {
             case "`":
                 let remaining = line.substringFromIndex(advance(start, i + 1))
                 i += scanClosedChar("`",inStr: remaining,tag: "code")
+            case "!":
+                if line[advance(start, i + 1)] != "[" {
+                    continue
+                }
+                i++
+                let remaining = line.substringFromIndex(advance(start, i + 1))
+                let posArray = MarkNoteParser.detectPositions(["]","(",")"],inStr: remaining)
+                if posArray.count == 3 {
+                    let title = line.substring(i + 1, end: i + 1 + posArray[0] - 1)
+                    let url = line.substring( i + 1 + posArray[1] + 1, end: i + 1 + posArray[2] - 1)
+                    output += "<img src=\"\(url)\" alt=\"\(title)\" />"                    
+                    i +=  posArray[2] + 1
+                }
+
             case "[":
                 let remaining = line.substringFromIndex(advance(start, i + 1))
                 let posArray = MarkNoteParser.detectPositions(["]","(",")"],inStr: remaining)

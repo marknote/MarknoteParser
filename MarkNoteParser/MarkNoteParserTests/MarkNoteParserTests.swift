@@ -54,6 +54,11 @@ class MarkNoteParserTests: XCTestCase {
         
     }
     
+    func testInlineImages() {
+        XCTAssertEqual("<img src=\"url\" alt=\"abc\" />", markdown("![abc](url)"), "inline image Pass")
+       
+    }
+    
     func testHRule() {
         XCTAssertEqual("<hr>\n", markdown("-----"), "HRule dashes Pass")
         XCTAssertEqual("<hr>\n", markdown("***"), "HRule asterisks Pass")
