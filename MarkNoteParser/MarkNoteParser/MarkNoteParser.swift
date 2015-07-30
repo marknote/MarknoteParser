@@ -12,6 +12,7 @@ public class MarkNoteParser: NSObject {
     var nCurrentBulletLevel = 0
     var bInTable = false
     var output = ""
+    var isInParagraph = false
     let headerChar:Character = "#"
     
     public static func toHtml(input:String) -> String{
@@ -43,6 +44,7 @@ public class MarkNoteParser: NSObject {
                 // not in block
                 if  line.length == 0 {
                     // empty line
+                    closeParagraph()
                     for var i = blockEndTags.count - 1; i >= 0; i-- {
                         output += blockEndTags[i]
                     }
@@ -99,6 +101,22 @@ public class MarkNoteParser: NSObject {
         for var i = blockEndTags.count - 1; i >= 0; i-- {
             output += blockEndTags[i]
         }
+        closeParagraph()
+        
+    }
+    
+    func closeParagraph () {
+        if isInParagraph {
+            isInParagraph = false
+            output += "</p>"
+        }
+    }
+    
+    func beginParagraph(){
+        if !isInParagraph {
+            isInParagraph = true
+            output += "<p>"
+        }
     }
     
     
@@ -118,11 +136,14 @@ public class MarkNoteParser: NSObject {
     }
     
     func handleLine(rawline:String) {
+        
         if rawline.contains3PlusandOnlyChars("-")
         || rawline.contains3PlusandOnlyChars("*")
         || rawline.contains3PlusandOnlyChars("_"){
+            closeParagraph()
             output += "<hr>\n"
             return
+            
         }
         var line = rawline
         var endTags = [String]()
@@ -140,6 +161,8 @@ public class MarkNoteParser: NSObject {
             output  += "<h\(nFindHead)>"
             endTags.append("</h\(nFindHead)>")
             pos = advance(pos, nFindHead)
+        } else {
+            beginParagraph()
         }
      
         //line = this.handleImage(line, sb)
@@ -151,6 +174,7 @@ public class MarkNoteParser: NSObject {
             output += endTags[i]
         }
         //output += "\n"
+        
     }
     
     func parseInLine(line: String) {

@@ -49,18 +49,18 @@ class MarkNoteParserTests: XCTestCase {
     }*/
     
     func testInlineLinks() {
-        XCTAssertEqual("<a href=\"www.google.com\">Google</a>", markdown("[Google](www.google.com)"), "inline link Pass")
-        XCTAssertEqual("<a href=\"www.google.com\" title=\"googlehome\">Google</a>", markdown("[Google](www.google.com \"googlehome\")"), "inline link Pass")
+        XCTAssertEqual("<p><a href=\"www.google.com\">Google</a></p>", markdown("[Google](www.google.com)"), "inline link Pass")
+        XCTAssertEqual("<p><a href=\"www.google.com\" title=\"googlehome\">Google</a></p>", markdown("[Google](www.google.com \"googlehome\")"), "inline link Pass")
         
     }
     
     func testInlineImages() {
-        XCTAssertEqual("<img src=\"url\" alt=\"abc\" />", markdown("![abc](url)"), "inline image Pass")
+        XCTAssertEqual("<p><img src=\"url\" alt=\"abc\" /></p>", markdown("![abc](url)"), "inline image Pass")
        
     }
     
     func testInlineImages2() {
-        XCTAssertEqual("!<img src=\"url\" alt=\"abc\" />", markdown("!![abc](url)"), "inline image Pass")
+        XCTAssertEqual("<p>!<img src=\"url\" alt=\"abc\" /></p>", markdown("!![abc](url)"), "inline image Pass")
         
     }
     
@@ -80,7 +80,7 @@ class MarkNoteParserTests: XCTestCase {
     }
     
     func testInlineCode() {
-        XCTAssertEqual("<code>Hello</code>", markdown("`Hello`\n"), "InlineCode Pass")
+        XCTAssertEqual("<p><code>Hello</code></p>", markdown("`Hello`\n"), "InlineCode Pass")
     }
     
     func testBlockCode() {
@@ -88,29 +88,29 @@ class MarkNoteParserTests: XCTestCase {
     }
     
     func testDoubleEmphasis() {
-        XCTAssertEqual("<strong>Hello</strong>", markdown("**Hello**"), "Double Emphasis Asterisk Pass")
-        XCTAssertEqual("<strong>World</strong>", markdown("__World__"), "Double Emphasis Underscope Pass")
+        XCTAssertEqual("<p><strong>Hello</strong></p>", markdown("**Hello**"), "Double Emphasis Asterisk Pass")
+        XCTAssertEqual("<p><strong>World</strong></p>", markdown("__World__"), "Double Emphasis Underscope Pass")
     }
     
     func testDoubleEmphasis2() {
-        XCTAssertEqual("123<strong>Hello</strong>456", markdown("123**Hello**456"), "Double Emphasis Asterisk Pass")
-        XCTAssertEqual("123<strong>World</strong>456", markdown("123__World__456"), "Double Emphasis Underscope Pass")
+        XCTAssertEqual("<p>123<strong>Hello</strong>456</p>", markdown("123**Hello**456"), "Double Emphasis Asterisk Pass")
+        XCTAssertEqual("<p>123<strong>World</strong>456</p>", markdown("123__World__456"), "Double Emphasis Underscope Pass")
     }
 
     
     func testEmphasis() {
-        XCTAssertEqual("<em>Hello</em>", markdown("*Hello*"), "Emphasis Asterisk Pass")
-        XCTAssertEqual("<em>World</em>", markdown("_World_"), "Emphasis Underscope Pass")
-        XCTAssertEqual("123<em>Hello</em>456", markdown("123*Hello*456"), "Emphasis Asterisk Pass")
-        XCTAssertEqual("123<em>World</em>456", markdown("123_World_456"), "Emphasis Underscope Pass")
-        XCTAssertEqual("123<em>Hello</em>456123<em>world</em>456", markdown("123*Hello*456123*world*456"), "Emphasis Asterisk Pass")
-        XCTAssertEqual("123<em>World</em>456123<em>world</em>456", markdown("123_World_456123*world*456"), "Emphasis Underscope Pass")
+        XCTAssertEqual("<p><em>Hello</em></p>", markdown("*Hello*"), "Emphasis Asterisk Pass")
+        XCTAssertEqual("<p><em>World</em></p>", markdown("_World_"), "Emphasis Underscope Pass")
+        XCTAssertEqual("<p>123<em>Hello</em>456</p>", markdown("123*Hello*456"), "Emphasis Asterisk Pass")
+        XCTAssertEqual("<p>123<em>World</em>456</p>", markdown("123_World_456"), "Emphasis Underscope Pass")
+        XCTAssertEqual("<p>123<em>Hello</em>456123<em>world</em>456</p>", markdown("123*Hello*456123*world*456"), "Emphasis Asterisk Pass")
+        XCTAssertEqual("<p>123<em>World</em>456123<em>world</em>456</p>", markdown("123_World_456123*world*456"), "Emphasis Underscope Pass")
     }
     
     func testBulletList()
     {
         let input = "A bulleted list:\n- a\n- b\n- c\n"
-        let expected = "A bulleted list:<ul><li>a</li><li>b</li><li>c</li></ul>"
+        let expected = "<p>A bulleted list:<ul><li>a</li><li>b</li><li>c</li></ul></p>"
         let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
         XCTAssertEqual(expected, actual)
     }
