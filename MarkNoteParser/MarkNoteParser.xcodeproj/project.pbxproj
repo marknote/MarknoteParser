@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A9983A841B6A642D00B0AB99 /* MarkNoteParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9983A831B6A642D00B0AB99 /* MarkNoteParser.swift */; };
 		A9C1B7441B63295C00A89EFD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C1B7431B63295C00A89EFD /* AppDelegate.swift */; };
 		A9C1B7461B63295C00A89EFD /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C1B7451B63295C00A89EFD /* ViewController.swift */; };
 		A9C1B7491B63295C00A89EFD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A9C1B7471B63295C00A89EFD /* Main.storyboard */; };
 		A9C1B74B1B63295C00A89EFD /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A9C1B74A1B63295C00A89EFD /* Images.xcassets */; };
 		A9C1B74E1B63295C00A89EFD /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = A9C1B74C1B63295C00A89EFD /* LaunchScreen.xib */; };
 		A9C1B75A1B63295C00A89EFD /* MarkNoteParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C1B7591B63295C00A89EFD /* MarkNoteParserTests.swift */; };
-		A9C1B7641B6353C200A89EFD /* MarkNoteParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C1B7631B6353C200A89EFD /* MarkNoteParser.swift */; };
 		A9C1B7671B63899E00A89EFD /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C1B7661B63899E00A89EFD /* StringExtensions.swift */; };
 /* End PBXBuildFile section */
 
@@ -28,6 +28,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A9983A831B6A642D00B0AB99 /* MarkNoteParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarkNoteParser.swift; sourceTree = "<group>"; };
 		A9C1B73E1B63295C00A89EFD /* MarkNoteParser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MarkNoteParser.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9C1B7421B63295C00A89EFD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A9C1B7431B63295C00A89EFD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -38,7 +39,6 @@
 		A9C1B7531B63295C00A89EFD /* MarkNoteParserTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MarkNoteParserTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9C1B7581B63295C00A89EFD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A9C1B7591B63295C00A89EFD /* MarkNoteParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkNoteParserTests.swift; sourceTree = "<group>"; };
-		A9C1B7631B6353C200A89EFD /* MarkNoteParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MarkNoteParser.swift; path = parser/MarkNoteParser.swift; sourceTree = "<group>"; };
 		A9C1B7661B63899E00A89EFD /* StringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -81,6 +81,7 @@
 		A9C1B7401B63295C00A89EFD /* MarkNoteParser */ = {
 			isa = PBXGroup;
 			children = (
+				A9983A831B6A642D00B0AB99 /* MarkNoteParser.swift */,
 				A9C1B7651B63899E00A89EFD /* util */,
 				A9C1B7431B63295C00A89EFD /* AppDelegate.swift */,
 				A9C1B7451B63295C00A89EFD /* ViewController.swift */,
@@ -88,7 +89,6 @@
 				A9C1B74A1B63295C00A89EFD /* Images.xcassets */,
 				A9C1B74C1B63295C00A89EFD /* LaunchScreen.xib */,
 				A9C1B7411B63295C00A89EFD /* Supporting Files */,
-				A9C1B7631B6353C200A89EFD /* MarkNoteParser.swift */,
 			);
 			path = MarkNoteParser;
 			sourceTree = "<group>";
@@ -227,7 +227,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A9C1B7671B63899E00A89EFD /* StringExtensions.swift in Sources */,
-				A9C1B7641B6353C200A89EFD /* MarkNoteParser.swift in Sources */,
+				A9983A841B6A642D00B0AB99 /* MarkNoteParser.swift in Sources */,
 				A9C1B7461B63295C00A89EFD /* ViewController.swift in Sources */,
 				A9C1B7441B63295C00A89EFD /* AppDelegate.swift in Sources */,
 			);
@@ -425,6 +425,7 @@
 				A9C1B75F1B63295C00A89EFD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		A9C1B7601B63295C00A89EFD /* Build configuration list for PBXNativeTarget "MarkNoteParserTests" */ = {
 			isa = XCConfigurationList;
@@ -433,6 +434,7 @@
 				A9C1B7621B63295C00A89EFD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

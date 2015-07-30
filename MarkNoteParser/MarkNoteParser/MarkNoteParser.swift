@@ -34,10 +34,10 @@ public class MarkNoteParser: NSObject {
             if isInCodeBlock {
                 if line.indexOf("```") == 0 {
                     isInCodeBlock = false
-                    output += "</code>"
+                    output += "</code>\n"
                     continue
                 }else {
-                    output += line
+                    output += line + "\n"
                 }
             } else {
                 // not in block
@@ -70,7 +70,13 @@ public class MarkNoteParser: NSObject {
                 
                 if  line.indexOf("```") == 0 {
                     isInCodeBlock = true
-                    output += "<code>"
+                    var cssClass = "no-highlight"
+                    if line.length > "```".length {
+                        //prettyprint javascript prettyprinted
+                        let remaining = line.substringFromIndex(advance(line.startIndex, "```".length))
+                        cssClass = "prettyprint \(remaining) prettyprinted"
+                    }
+                    output += "<code class=\"\(cssClass)\">\n"
                     continue // ignor current line
                 }
 
@@ -87,6 +93,7 @@ public class MarkNoteParser: NSObject {
                     }
                 }
                 handleLine(line)
+                //output += "</p>"
             }
         }//end for
         for var i = blockEndTags.count - 1; i >= 0; i-- {
@@ -185,7 +192,9 @@ public class MarkNoteParser: NSObject {
                 let remaining = line.substringFromIndex(advance(start, i + 1))
                 i += scanClosedChar("`",inStr: remaining,tag: "code")
             case "!":
-                if line[advance(start, i + 1)] != "[" {
+                
+                if i >= line.length - 1 || line[advance(start, i + 1)] != "[" {
+                    output.append(ch)
                     continue
                 }
                 i++
@@ -194,7 +203,14 @@ public class MarkNoteParser: NSObject {
                 if posArray.count == 3 {
                     let title = line.substring(i + 1, end: i + 1 + posArray[0] - 1)
                     let url = line.substring( i + 1 + posArray[1] + 1, end: i + 1 + posArray[2] - 1)
-                    output += "<img src=\"\(url)\" alt=\"\(title)\" />"                    
+                    let posSpace = url.indexOf(" ")
+                    if posSpace > 0 {
+                        let urlBody = url.substring(0, end: posSpace - 1)
+                        let urlTile = url.substringFromIndex(advance(url.startIndex, posSpace + 1))
+                        output += "<img src=\"\(urlBody)\" title=\"" + urlTile.replaceAll("\"", toStr: "") + "\" alt=\"\(title)\" />"
+                    } else {
+                        output += "<img src=\"\(url)\" alt=\"\(title)\" />"
+                    }
                     i +=  posArray[2] + 1
                 }
 
