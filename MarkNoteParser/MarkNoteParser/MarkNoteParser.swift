@@ -27,7 +27,7 @@ public class MarkNoteParser: NSObject {
         
         var currentPos = 0
         var tagBegin = input.indexOf("<")
-        if tagBegin > currentPos {
+        if tagBegin > 0 {
             parseNoHtml(input.substring(currentPos, end: tagBegin - 1))
             //currentPos = tagBegin
             if tagBegin < input.length - 1 {
@@ -44,13 +44,26 @@ public class MarkNoteParser: NSObject {
                     } else {
                         // there is a close tag
                         currentPos = endTag
-                        left = left.substringFromIndex(advance(left.startIndex,endTag ))
-                        endTag = left.indexOf(">")
-                        if endTag > 0 {
-                            self.output += input.substring(tagBegin, end: tagBegin + endTag + currentPos) + left.substringToIndex(advance(left.startIndex,endTag ))
+                        if endTag <= left.length - 1 {
+                            left = left.substringFromIndex(advance(left.startIndex,endTag + 1 ))
+                            endTag = left.indexOf(">")
+                            if endTag > 0 {
+                                self.output += input.substring(tagBegin, end: tagBegin + endTag + currentPos + 1) //+ left.substringToIndex(advance(left.startIndex,endTag ))
+                                if endTag < left.length - 1 {
+                                    left = left.substringFromIndex(advance(left.startIndex,endTag + 1 ))
+                                    parse(left)
+                                    return
+                                }
+                                
+                            } else {
+                                parseNoHtml(input)
+                                return
+                            }
                         } else {
-                            parseNoHtml(input)
+                            output += input
+                            return
                         }
+                        
                     }
                 }else {
                     // not found

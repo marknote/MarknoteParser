@@ -145,6 +145,14 @@ class MarkNoteParserTests: XCTestCase {
         let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
         XCTAssertEqual(expected, actual)
     }
+    
+    func testHTMLTag2(){
+        
+        let input = "111<a href='abc'>123</a>222"
+        let expected = "<p>111</p><a href='abc'>123</a><p>222</p>"
+        let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
+        XCTAssertEqual(expected, actual)
+    }
 
 
 
