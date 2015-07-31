@@ -17,13 +17,55 @@ public class MarkNoteParser: NSObject {
     
     public static func toHtml(input:String) -> String{
         var instance = MarkNoteParser()
+        instance.output = ""
         instance.parse(input)
         return instance.output
     }
     
+    
     func parse (input:String){
-        output = ""
+        
+        var currentPos = 0
+        var tagBegin = input.indexOf("<")
+        if tagBegin > currentPos {
+            parseNoHtml(input.substring(currentPos, end: tagBegin - 1))
+            //currentPos = tagBegin
+            if tagBegin < input.length - 1 {
+                var left = input.substring(tagBegin, end: input.length - 1)
+                var endTag = left.indexOf(">")
+                if endTag > 0 {
+                    // found
+                    if left[endTag - 1] == "/" {
+                        //auto close: <XXX />
+                        self.output += left.substringToIndex(advance(left.startIndex, endTag))
+                        if endTag < left.length - 1 {
+                            parse(left.substringFromIndex(advance(left.startIndex,endTag )))
+                        }
+                    } else {
+                        // there is a close tag
+                        currentPos = endTag
+                        left = left.substringFromIndex(advance(left.startIndex,endTag ))
+                        endTag = left.indexOf(">")
+                        if endTag > 0 {
+                            self.output += input.substring(tagBegin, end: tagBegin + endTag + currentPos) + left.substringToIndex(advance(left.startIndex,endTag ))
+                        } else {
+                            parseNoHtml(input)
+                        }
+                    }
+                }else {
+                    // not found
+                    parseNoHtml(left)
+                }
+                
+            }
+        }else {
+            parseNoHtml(input)
+        }
+    }
+    func parseNoHtml (input:String){
         var preProceeded = input.stringByReplacingOccurrencesOfString("\r\n", withString:"\n", options: NSStringCompareOptions.LiteralSearch, range: nil)
+        
+        
         let lines = split(preProceeded){$0 == "\n"}
         var isInCodeBlock:Bool = false
         var blockEndTags = [String]()
