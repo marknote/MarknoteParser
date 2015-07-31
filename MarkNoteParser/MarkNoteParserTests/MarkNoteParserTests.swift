@@ -129,6 +129,23 @@ class MarkNoteParserTests: XCTestCase {
         XCTAssertEqual(expected, actual)
         
     }
+    
+    func testHTMLTag(){
+        
+        let input = "<a name=\"html\"/>"
+        let expected = "<p><a name=\"html\"/></p>"
+        let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
+        XCTAssertEqual(expected, actual)
+    }
+    
+    func testMixedHTMLTag(){
+        
+        let input = "<a name=\"html\"/>\n## Inline HTML\nYou can also use raw HTML in your Markdown"
+        let expected = "<p><a name=\"html\"/><h2>Inline HTML</h2>You can also use raw HTML in your Markdown</p>"
+        let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
+        XCTAssertEqual(expected, actual)
+    }
+
 
 
     
