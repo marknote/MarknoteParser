@@ -92,10 +92,10 @@ public class MarkNoteParser: NSObject {
             if isInCodeBlock {
                 if line.indexOf("```") == 0 {
                     isInCodeBlock = false
-                    output += "</code>\n"
+                    output += "</pre>\n"
                     continue
                 }else {
-                    output += line + "\n"
+                    output += line.replaceAll("\"", toStr:"&quot;") + "\n"
                 }
             } else {
                 // not in block
@@ -133,9 +133,9 @@ public class MarkNoteParser: NSObject {
                     if line.length > "```".length {
                         //prettyprint javascript prettyprinted
                         let remaining = line.substringFromIndex(advance(line.startIndex, "```".length))
-                        cssClass = "prettyprint \(remaining) prettyprinted"
+                        cssClass = "lang-\(remaining)"
                     }
-                    output += "<code class=\"\(cssClass)\">\n"
+                    output += "<pre class=\"\(cssClass)\">\n"
                     continue // ignor current line
                 }
 
@@ -165,7 +165,7 @@ public class MarkNoteParser: NSObject {
     func closeParagraph () {
         if isInParagraph {
             isInParagraph = false
-            output += "</p>"
+            output += "</p>\n"
         }
     }
     
@@ -226,6 +226,7 @@ public class MarkNoteParser: NSObject {
         
         var remaining = line.substringFromIndex(pos).trim()
         parseInLine(remaining)
+        //output += "\n"
         
         for var i = endTags.count - 1; i >= 0; i-- {
             output += endTags[i]
@@ -268,6 +269,20 @@ public class MarkNoteParser: NSObject {
                 } else {
                     let remaining = line.substringFromIndex(advance(start, i + 1))
                     i += scanClosedChar("_",inStr: remaining,tag: "em")
+                }
+            case "~":
+                if (i + 1 > len - 1) {
+                    self.output.append(ch)
+                    return
+                }
+                if line[advance(start, i + 1)] == "~" {
+                    //possible ~~
+                    let remaining = line.substringFromIndex(advance(start, i + 2))
+                    i += scanClosedChar("~~",inStr: remaining,tag: "u") + 1
+                    
+                } else {
+                    let remaining = line.substringFromIndex(advance(start, i + 1))
+                    i += scanClosedChar("~",inStr: remaining,tag: "em")
                 }
             case "`":
                 let remaining = line.substringFromIndex(advance(start, i + 1))
@@ -314,8 +329,7 @@ public class MarkNoteParser: NSObject {
             default:
                 //do nothing
                 output.append(ch)
-            }
-        
+            }        
         }
     }
     

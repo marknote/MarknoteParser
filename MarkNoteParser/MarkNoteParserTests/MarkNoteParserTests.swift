@@ -26,85 +26,94 @@ class MarkNoteParserTests: XCTestCase {
         return result
     }
     
+    /*func assertHtmlEauql(expected:String, actual:String){
+        return assertHtmlEauql(expected, actual,"")
+    }*/
+    
+    func assertHtmlEauql(expected:String, _ actual:String, _ message:String = ""){
+        return XCTAssertEqual(expected.stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil),
+            actual.stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil),
+            message)
+    }
+    
     func testHeading() {
-        XCTAssertEqual("<h1>Hello</h1>", markdown("# Hello"), "H1 Heading Pass")
-        XCTAssertEqual("<h2>Hello</h2>", markdown("## Hello"), "H2 Heading Pass")
-        XCTAssertEqual("<h3>Hello</h3>", markdown("### Hello"), "H3 Heading Pass")
-        XCTAssertEqual("<h4>Hello</h4>", markdown("#### Hello"), "H4 Heading Pass")
-        XCTAssertEqual("<h5>Hello</h5>", markdown("##### Hello"), "H5 Heading Pass")
-        XCTAssertEqual("<h6>Hello</h6>", markdown("###### Hello"), "H6 Heading Pass")
+        assertHtmlEauql("<h1>Hello</h1>", markdown("# Hello"), "H1 Heading Pass")
+        assertHtmlEauql("<h2>Hello</h2>", markdown("## Hello"), "H2 Heading Pass")
+        assertHtmlEauql("<h3>Hello</h3>", markdown("### Hello"), "H3 Heading Pass")
+        assertHtmlEauql("<h4>Hello</h4>", markdown("#### Hello"), "H4 Heading Pass")
+        assertHtmlEauql("<h5>Hello</h5>", markdown("##### Hello"), "H5 Heading Pass")
+        assertHtmlEauql("<h6>Hello</h6>", markdown("###### Hello"), "H6 Heading Pass")
     }
     
-    /*    
+    
     func testFencedCode() {
-        XCTAssertEqual("<pre><code class=\"lang-swift\">println(&quot;Hello&quot;)\n</code></pre>\n", markdown("```swift\nprintln(\"Hello\")\n```"), "Fenced Code Pass")
+        assertHtmlEauql("<pre class=\"lang-swift\">println(&quot;Hello&quot;)\n</pre>\n", markdown("```swift\nprintln(\"Hello\")\n```"), "Fenced Code Pass")
     }
-    
-    func testBlockCode() {
-        XCTAssertEqual("<pre><code>printf(&quot;Hello World&quot;)\n</code></pre>\n", markdown("    printf(\"Hello World\")"), "Block Code Pass")
-    }    
+        /*
     func testDefLinks() {
-        XCTAssertEqual("<a href=\"www.google.com\">Google</a>", markdown("[Google][]\n\n [Google]:www.google.com\n"), "Deflink no title Pass")
-        XCTAssertEqual("<a href=\"www.google.com\" title=\"GoogleSearch\">Google</a>", markdown("[Google][]\n\n [Google]:www.google.com \"GoogleSearch\"\n"), "Deflink no title Pass")
+        assertHtmlEauql("<a href=\"www.google.com\">Google</a>", markdown("[Google][]\n\n [Google]:www.google.com\n"), "Deflink no title Pass")
+        assertHtmlEauql("<a href=\"www.google.com\" title=\"GoogleSearch\">Google</a>", markdown("[Google][]\n\n [Google]:www.google.com \"GoogleSearch\"\n"), "Deflink no title Pass")
     }*/
     
     func testInlineLinks() {
-        XCTAssertEqual("<p><a href=\"www.google.com\">Google</a></p>", markdown("[Google](www.google.com)"), "inline link Pass")
-        XCTAssertEqual("<p><a href=\"www.google.com\" title=\"googlehome\">Google</a></p>", markdown("[Google](www.google.com \"googlehome\")"), "inline link Pass")
+        assertHtmlEauql("<p><a href=\"www.google.com\">Google</a></p>\n", markdown("[Google](www.google.com)"), "inline link Pass")
+        assertHtmlEauql("<p><a href=\"www.google.com\" title=\"googlehome\">Google</a></p>\n", markdown("[Google](www.google.com \"googlehome\")"), "inline link Pass")
         
     }
     
     func testInlineImages() {
-        XCTAssertEqual("<p><img src=\"url\" alt=\"abc\" /></p>", markdown("![abc](url)"), "inline image Pass")
+        assertHtmlEauql("<p><img src=\"url\" alt=\"abc\" /></p>\n", markdown("![abc](url)"), "inline image Pass")
        
     }
     
     func testInlineImages2() {
-        XCTAssertEqual("<p>!<img src=\"url\" alt=\"abc\" /></p>", markdown("!![abc](url)"), "inline image Pass")
+        assertHtmlEauql("<p>!<img src=\"url\" alt=\"abc\" /></p>\n", markdown("!![abc](url)"), "inline image Pass")
         
     }
     
     func testHRule() {
-        XCTAssertEqual("<hr>\n", markdown("-----"), "HRule dashes Pass")
-        XCTAssertEqual("<hr>\n", markdown("***"), "HRule asterisks Pass")
-        XCTAssertEqual("<hr>\n", markdown("___"), "HRule underscope Pass")
+        assertHtmlEauql("<hr>\n", markdown("-----"), "HRule dashes Pass")
+        assertHtmlEauql("<hr>\n", markdown("***"), "HRule asterisks Pass")
+        assertHtmlEauql("<hr>\n", markdown("___"), "HRule underscope Pass")
     }
     
     func testLHeading() {
-        XCTAssertEqual("<h1>Hello</h1>\n", markdown("Hello\n====="), "H1 LHeading Pass")
-        XCTAssertEqual("<h2>Hello</h2>\n", markdown("Hello\n-----"), "H2 LHeading Pass")
+        assertHtmlEauql("<h1>Hello</h1>\n", markdown("Hello\n====="), "H1 LHeading Pass")
+        assertHtmlEauql("<h2>Hello</h2>\n", markdown("Hello\n-----"), "H2 LHeading Pass")
     }
     
     func testBlockQuote() {
-        XCTAssertEqual("<blockquote><h3>Hello</h3></blockquote>", markdown(">### Hello"), "HRule dashes Pass")
+        assertHtmlEauql("<blockquote><h3>Hello</h3></blockquote>", markdown(">### Hello"), "HRule dashes Pass")
     }
     
     func testInlineCode() {
-        XCTAssertEqual("<p><code>Hello</code></p>", markdown("`Hello`\n"), "InlineCode Pass")
+        assertHtmlEauql("<p><code>Hello</code></p>\n", markdown("`Hello`\n"), "InlineCode Pass")
     }
     
     func testBlockCode() {
-        XCTAssertEqual("<code class=\"no-highlight\">\nHello\n</code>\n", markdown("``` \r\nHello\r\n```\n"), "BlockCode Pass")
+        assertHtmlEauql("<pre class=\"no-highlight\">\nHello\n</pre>\n", markdown("``` \r\nHello\r\n```\n"), "BlockCode Pass")
     }
     
     func testDoubleEmphasis() {
-        XCTAssertEqual("<p><strong>Hello</strong></p>", markdown("**Hello**"), "Double Emphasis Asterisk Pass")
-        XCTAssertEqual("<p><strong>World</strong></p>", markdown("__World__"), "Double Emphasis Underscope Pass")
+        assertHtmlEauql("<p><strong>Hello</strong></p>\n", markdown("**Hello**"), "Double Emphasis Asterisk Pass")
+        assertHtmlEauql("<p><strong>World</strong></p>\n", markdown("__World__"), "Double Emphasis Underscope Pass")
+        assertHtmlEauql("<p><u>Hello</u></p>\n", markdown("~~Hello~~"), "Double Emphasis Asterisk Pass")
+       
     }
     
     func testDoubleEmphasis2() {
-        XCTAssertEqual("<p>123<strong>Hello</strong>456</p>", markdown("123**Hello**456"), "Double Emphasis Asterisk Pass")
-        XCTAssertEqual("<p>123<strong>World</strong>456</p>", markdown("123__World__456"), "Double Emphasis Underscope Pass")
+        assertHtmlEauql("<p>123<strong>Hello</strong>456</p>\n", markdown("123**Hello**456"), "Double Emphasis Asterisk Pass")
+        assertHtmlEauql("<p>123<strong>World</strong>456</p>\n", markdown("123__World__456"), "Double Emphasis Underscope Pass")
     }
 
     
     func testEmphasis() {
-        XCTAssertEqual("<p><em>Hello</em></p>", markdown("*Hello*"), "Emphasis Asterisk Pass")
-        XCTAssertEqual("<p><em>World</em></p>", markdown("_World_"), "Emphasis Underscope Pass")
-        XCTAssertEqual("<p>123<em>Hello</em>456</p>", markdown("123*Hello*456"), "Emphasis Asterisk Pass")
-        XCTAssertEqual("<p>123<em>World</em>456</p>", markdown("123_World_456"), "Emphasis Underscope Pass")
-        XCTAssertEqual("<p>123<em>Hello</em>456123<em>world</em>456</p>", markdown("123*Hello*456123*world*456"), "Emphasis Asterisk Pass")
-        XCTAssertEqual("<p>123<em>World</em>456123<em>world</em>456</p>", markdown("123_World_456123*world*456"), "Emphasis Underscope Pass")
+        assertHtmlEauql("<p><em>Hello</em></p>\n", markdown("*Hello*"), "Emphasis Asterisk Pass")
+        assertHtmlEauql("<p><em>World</em></p>\n", markdown("_World_"), "Emphasis Underscope Pass")
+        assertHtmlEauql("<p>123<em>Hello</em>456</p>\n", markdown("123*Hello*456"), "Emphasis Asterisk Pass")
+        assertHtmlEauql("<p>123<em>World</em>456</p>\n", markdown("123_World_456"), "Emphasis Underscope Pass")
+        assertHtmlEauql("<p>123<em>Hello</em>456123<em>world</em>456</p>\n", markdown("123*Hello*456123*world*456"), "Emphasis Asterisk Pass")
+        assertHtmlEauql("<p>123<em>World</em>456123<em>world</em>456</p>\n", markdown("123_World_456123*world*456"), "Emphasis Underscope Pass")
     }
     
     func testBulletList()
@@ -112,7 +121,7 @@ class MarkNoteParserTests: XCTestCase {
         let input = "A bulleted list:\n- a\n- b\n- c\n"
         let expected = "<p>A bulleted list:<ul><li>a</li><li>b</li><li>c</li></ul></p>"
         let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
-        XCTAssertEqual(expected, actual)
+        assertHtmlEauql(expected, actual)
     }
     
     
@@ -135,7 +144,7 @@ class MarkNoteParserTests: XCTestCase {
         let input = "<a name=\"html\"/>"
         let expected = "<p><a name=\"html\"/></p>"
         let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
-        XCTAssertEqual(expected, actual)
+        assertHtmlEauql(expected, actual)
     }
     
     func testMixedHTMLTag(){
@@ -143,7 +152,7 @@ class MarkNoteParserTests: XCTestCase {
         let input = "<a name=\"html\"/>\n## Inline HTML\nYou can also use raw HTML in your Markdown"
         let expected = "<p><a name=\"html\"/><h2>Inline HTML</h2>You can also use raw HTML in your Markdown</p>"
         let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
-        XCTAssertEqual(expected, actual)
+        assertHtmlEauql(expected, actual)
     }
     
     func testHTMLTag2(){
@@ -151,15 +160,15 @@ class MarkNoteParserTests: XCTestCase {
         let input = "111<a href='abc'>123</a>222"
         let expected = "<p>111</p><a href='abc'>123</a><p>222</p>"
         let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
-        XCTAssertEqual(expected, actual)
+        assertHtmlEauql(expected, actual)
     }
     
     func testHTMLInCode(){
         
         let input = "```\n&lt;html&gt;\n```\n"
-        let expected = "<code class=\"no-highlight\">&lt;html&gt;</code>"
+        let expected = "<pre class=\"no-highlight\">&lt;html&gt;</pre>"
         let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
-        XCTAssertEqual(expected, actual)
+        assertHtmlEauql(expected, actual)
     }
 
 
