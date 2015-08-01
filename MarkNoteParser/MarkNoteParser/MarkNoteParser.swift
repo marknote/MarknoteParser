@@ -152,6 +152,11 @@ public class MarkNoteParser: NSObject {
                     }
                 }
                 handleLine(line)
+                if lines[i].length >= 2
+                    && lines[i].substringFromIndex(advance(lines[i].startIndex, lines[i].length - 2)) == "  " {
+                        output += "<br/>"
+                }
+                
                 //output += "</p>"
             }
         }//end for
@@ -231,6 +236,7 @@ public class MarkNoteParser: NSObject {
         for var i = endTags.count - 1; i >= 0; i-- {
             output += endTags[i]
         }
+        
         //output += "\n"
         
     }

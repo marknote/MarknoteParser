@@ -170,6 +170,15 @@ class MarkNoteParserTests: XCTestCase {
         let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
         assertHtmlEauql(expected, actual)
     }
+    
+    func testNewLine(){
+        
+        let input = "abc  \n123"
+        let expected = "<p>abc<br/>123</p>"
+        let actual = markdown(input)
+        assertHtmlEauql(expected, actual)
+    }
+
 
 
 
