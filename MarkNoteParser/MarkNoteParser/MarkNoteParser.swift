@@ -10,9 +10,10 @@ public class MarkNoteParser: NSObject {
     
     //var nOldBulletLevel = 0
     var nCurrentBulletLevel = 0
-    //var bInTable = false
+    var bInTable = false
     var output = ""
     var isInParagraph = false
+    var isAfterEmptyLine = false
     let headerChar:Character = "#"
     
     public static func toHtml(input:String) -> String{
@@ -95,16 +96,24 @@ public class MarkNoteParser: NSObject {
                 }else {
                     output += line.replaceAll("\"", toStr:"&quot;") + "\n"
                 }
+            } else if bInTable {
+                handleTableLine(line, isHead:false)
             } else {
                 // not in block
                 if  line.length == 0 {
                     // empty line
                     closeParagraph()
+                    closeTable()
                     for var i = blockEndTags.count - 1; i >= 0; i-- {
                         output += blockEndTags[i]
+                        blockEndTags.removeAtIndex(i)
                     }
                     blockEndTags.removeAll(keepCapacity: false)
+                    isAfterEmptyLine = true
+                    
                     continue
+                }else {
+                    isAfterEmptyLine = false
                 }
                 
                 if line.indexOf("- ") == 0 {
@@ -147,8 +156,18 @@ public class MarkNoteParser: NSObject {
                         output += "<h2>" + line + "</h2>\n"
                         i++
                         continue
-                    }
-                }
+                    } else if  nextLine.indexOf("|") >= 0
+                        && line.indexOf("|") >= 0
+                        && nextLine.replaceAll("|", toStr: "").replaceAll("-", toStr: "").replaceAll(":", toStr: "").replaceAll(" ", toStr: "").length == 0
+                        {
+                            beginTable()
+                            handleTableLine(line, isHead:true)
+                            i++
+                            continue
+                        }
+                }                
+                
+                
                 handleLine(line)
                 if lines[i].length >= 2
                     && lines[i].substringFromIndex(advance(lines[i].startIndex, lines[i].length - 2)) == "  " {
@@ -159,10 +178,43 @@ public class MarkNoteParser: NSObject {
             }
         }//end for
         for var i = blockEndTags.count - 1; i >= 0; i-- {
-            output += blockEndTags[i]
+            output += blockEndTags[i] + "\n"
+            blockEndTags.removeAtIndex(i)
         }
+        blockEndTags.removeAll(keepCapacity: false)
         closeParagraph()
         
+    }
+    
+    func handleTableLine(rawline:String, isHead:Bool) {
+        
+        let cols = split(rawline){$0 == "|"}
+        output += "<tr>"
+        for col in cols {
+            if isHead {
+                output += "<th>"
+                parseInLine(col)
+                output += "</th>"
+            } else {
+                output += "<td>"
+                parseInLine(col)
+                output += "</td>"
+            }
+        }
+        output += "</tr>"
+    }
+    
+    func beginTable(){
+        if !bInTable {
+            bInTable = true
+            output += "<table>"
+        }
+    }
+    func closeTable(){
+        if bInTable {
+            bInTable = false
+            output += "</table>"
+        }
     }
     
     func closeParagraph () {
@@ -203,7 +255,6 @@ public class MarkNoteParser: NSObject {
             closeParagraph()
             output += "<hr>\n"
             return
-            
         }
         var line = rawline
         var endTags = [String]()

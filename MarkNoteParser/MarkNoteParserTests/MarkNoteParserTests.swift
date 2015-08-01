@@ -178,9 +178,12 @@ class MarkNoteParserTests: XCTestCase {
         let actual = markdown(input)
         assertHtmlEauql(expected, actual)
     }
-
-
-
-
     
+    func testTable(){
+        
+        let input = "|a|b|c|\n|------|-----|-----|\n|1|2|3|\n\n\n"
+        let expected = "<table><tr><th>a</th><th>b</th><th>c</th></tr><tr><td>1</td><td>2</td><td>3</td></tr></table>"
+        let actual = markdown(input)
+        assertHtmlEauql(expected, actual)
+    }
 }
