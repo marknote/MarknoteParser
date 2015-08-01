@@ -22,13 +22,16 @@ public class MarkNoteParser: NSObject {
         return instance.output
     }
     
-    
     func parse (input:String){
-        
+        proceedHTMLTags(input)
+    }
+    
+    
+    func proceedHTMLTags(input:String){
         var currentPos = 0
         var tagBegin = input.indexOf("<")
         if tagBegin > 0 {
-            parseNoHtml(input.substring(currentPos, end: tagBegin - 1))
+            proceedNoHtml(input.substring(currentPos, end: tagBegin - 1))
             //currentPos = tagBegin
             if tagBegin < input.length - 1 {
                 var left = input.substring(tagBegin, end: input.length - 1)
@@ -39,7 +42,7 @@ public class MarkNoteParser: NSObject {
                         //auto close: <XXX />
                         self.output += left.substringToIndex(advance(left.startIndex, endTag))
                         if endTag < left.length - 1 {
-                            parse(left.substringFromIndex(advance(left.startIndex,endTag )))
+                            proceedHTMLTags(left.substringFromIndex(advance(left.startIndex,endTag )))
                         }
                     } else {
                         // there is a close tag
@@ -51,12 +54,11 @@ public class MarkNoteParser: NSObject {
                                 self.output += input.substring(tagBegin, end: tagBegin + endTag + currentPos + 1) //+ left.substringToIndex(advance(left.startIndex,endTag ))
                                 if endTag < left.length - 1 {
                                     left = left.substringFromIndex(advance(left.startIndex,endTag + 1 ))
-                                    parse(left)
+                                    proceedHTMLTags(left)
                                     return
                                 }
-                                
                             } else {
-                                parseNoHtml(input)
+                                proceedNoHtml(input)
                                 return
                             }
                         } else {
@@ -67,15 +69,15 @@ public class MarkNoteParser: NSObject {
                     }
                 }else {
                     // not found
-                    parseNoHtml(left)
+                    proceedNoHtml(left)
                 }
                 
             }
         }else {
-            parseNoHtml(input)
+            proceedNoHtml(input)
         }
     }
-    func parseNoHtml (input:String){
+    func proceedNoHtml (input:String){
         var preProceeded = input.stringByReplacingOccurrencesOfString("\r\n", withString:"\n", options: NSStringCompareOptions.LiteralSearch, range: nil)
         
         

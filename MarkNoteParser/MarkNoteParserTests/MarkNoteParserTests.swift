@@ -153,6 +153,14 @@ class MarkNoteParserTests: XCTestCase {
         let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
         XCTAssertEqual(expected, actual)
     }
+    
+    func testHTMLInCode(){
+        
+        let input = "```\n&lt;html&gt;\n```\n"
+        let expected = "<code class=\"no-highlight\">&lt;html&gt;</code>"
+        let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
+        XCTAssertEqual(expected, actual)
+    }
 
 
 
