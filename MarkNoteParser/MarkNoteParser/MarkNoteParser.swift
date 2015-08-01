@@ -8,9 +8,9 @@ import UIKit
 
 public class MarkNoteParser: NSObject {
     
-    var nOldBulletLevel = 0
+    //var nOldBulletLevel = 0
     var nCurrentBulletLevel = 0
-    var bInTable = false
+    //var bInTable = false
     var output = ""
     var isInParagraph = false
     let headerChar:Character = "#"
@@ -65,13 +65,11 @@ public class MarkNoteParser: NSObject {
                             output += input
                             return
                         }
-                        
                     }
                 }else {
                     // not found
                     proceedNoHtml(left)
                 }
-                
             }
         }else {
             proceedNoHtml(input)
@@ -261,7 +259,6 @@ public class MarkNoteParser: NSObject {
                     let remaining = line.substringFromIndex(advance(start, i + 1))
                     i += scanClosedChar("*",inStr: remaining,tag: "em")
                 }
-
             case "_":
                 if (i + 1 > len - 1) {
                     self.output.append(ch)
@@ -363,8 +360,7 @@ public class MarkNoteParser: NSObject {
             output += ch
         }
         return pos + ch.length 
-    }
-    
+    }  
   
    
 }
