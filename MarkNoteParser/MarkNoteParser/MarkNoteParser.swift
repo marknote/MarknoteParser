@@ -16,6 +16,8 @@ public class MarkNoteParser: NSObject {
     var isAfterEmptyLine = false
     var tableColsAlignment = [String]()
     let headerChar:Character = "#"
+    var blockEndTags = [String]()
+    var isCurrentLineNeedBr = true
     
     public static func toHtml(input:String) -> String{
         var instance = MarkNoteParser()
@@ -23,6 +25,8 @@ public class MarkNoteParser: NSObject {
         instance.parse(input)
         return instance.output
     }
+    
+    
     
     func parse (input:String){
         proceedHTMLTags(input)
@@ -32,8 +36,10 @@ public class MarkNoteParser: NSObject {
     func proceedHTMLTags(input:String){
         var currentPos = 0
         var tagBegin = input.indexOf("<")
-        if tagBegin > 0 {
-            proceedNoHtml(input.substring(currentPos, end: tagBegin - 1))
+        if tagBegin >= 0 {
+            if tagBegin >= 1 {
+                proceedNoHtml(input.substring(currentPos, end: tagBegin - 1))
+            }
             //currentPos = tagBegin
             if tagBegin < input.length - 1 {
                 var left = input.substring(tagBegin, end: input.length - 1)
@@ -42,9 +48,9 @@ public class MarkNoteParser: NSObject {
                     // found
                     if left[endTag - 1] == "/" {
                         //auto close: <XXX />
-                        self.output += left.substringToIndex(advance(left.startIndex, endTag))
-                        if endTag < left.length - 1 {
-                            proceedHTMLTags(left.substringFromIndex(advance(left.startIndex,endTag )))
+                        self.output += left.substringToIndex(advance(left.startIndex, endTag + 1))
+                        if endTag < left.length - 2 {
+                            proceedHTMLTags(left.substringFromIndex(advance(left.startIndex,endTag + 1 )))
                         }
                     } else {
                         // there is a close tag
@@ -78,22 +84,25 @@ public class MarkNoteParser: NSObject {
         }
     }
     func proceedNoHtml (input:String){
-        var preProceeded = input.stringByReplacingOccurrencesOfString("\r\n", withString:"\n", options: NSStringCompareOptions.LiteralSearch, range: nil)
+        var preProceeded = input.replaceAll("\r\n", toStr: "\n").replaceAll("\n", toStr:"  \n")
         
         
         //let lines = split(preProceeded){$0 == "\n"}
         let lines = preProceeded.componentsSeparatedByString("\n")
         var isInCodeBlock:Bool = false
-        var blockEndTags = [String]()
+        
         
         //for rawline in lines {
         for var i = 0; i < lines.count; i++ {
+            isCurrentLineNeedBr = true
+
             let line = lines[i].trim()
             
             if isInCodeBlock {
-                if line.indexOf("```") == 0 {
+                if line.indexOf("```") >= 0 {
                     isInCodeBlock = false
                     output += "</pre>\n"
+                    isCurrentLineNeedBr = false
                     continue
                 }else {
                     output += line.replaceAll("\"", toStr:"&quot;") + "\n"
@@ -104,15 +113,13 @@ public class MarkNoteParser: NSObject {
                 // not in block
                 if  line.length == 0 {
                     // empty line
-                    for var i = blockEndTags.count - 1; i >= 0; i-- {
-                        output += blockEndTags[i]
-                        blockEndTags.removeAtIndex(i)
-                    }
-                    blockEndTags.removeAll(keepCapacity: false)
+                    closeTags()
                     closeParagraph()
                     closeTable()
                     
                     isAfterEmptyLine = true
+                    isCurrentLineNeedBr = false
+
                     
                     continue
                 }else {
@@ -124,6 +131,8 @@ public class MarkNoteParser: NSObject {
                         output += "<ul>\n"
                         blockEndTags.append("</ul>\n")
                         self.nCurrentBulletLevel = 1
+                        isCurrentLineNeedBr = false
+
                     }
                     output += "<li>"
                     let newline = line.substring("- ".length, end: line.length - 1)
@@ -173,7 +182,8 @@ public class MarkNoteParser: NSObject {
                 
                 
                 handleLine(line)
-                if lines[i].length >= 2
+                if  isCurrentLineNeedBr
+                    && lines[i].length >= 2
                     && lines[i].substringFromIndex(advance(lines[i].startIndex, lines[i].length - 2)) == "  " {
                         output += "<br/>"
                 }
@@ -181,11 +191,7 @@ public class MarkNoteParser: NSObject {
                 //output += "</p>"
             }
         }//end for
-        for var i = blockEndTags.count - 1; i >= 0; i-- {
-            output += blockEndTags[i] + "\n"
-            blockEndTags.removeAtIndex(i)
-        }
-        blockEndTags.removeAll(keepCapacity: false)
+        closeTags()
         closeParagraph()
         
     }
@@ -217,7 +223,7 @@ public class MarkNoteParser: NSObject {
             bInTable = true
             output += "<table>"
             self.tableColsAlignment.removeAll(keepCapacity: false)
-            let arr = alignmentLine.componentsSeparatedByString("|")
+            let arr = alignmentLine.trim().componentsSeparatedByString("|")
             for col in arr {
                 if col.indexOf(":-") >= 0 && col.indexOf("-:") > 0 {
                     self.tableColsAlignment.append("style=\"text-align: center;\"")
@@ -234,6 +240,13 @@ public class MarkNoteParser: NSObject {
             bInTable = false
             output += "</table>"
         }
+    }
+    func closeTags(){
+        for var i = blockEndTags.count - 1; i >= 0; i-- {
+            output += blockEndTags[i]
+            //blockEndTags.removeAtIndex(i)
+        }
+        blockEndTags.removeAll(keepCapacity: false)
     }
     
     func closeParagraph () {
@@ -288,6 +301,8 @@ public class MarkNoteParser: NSObject {
         
         var nFindHead = calculateHeadLevel(line)
         if (nFindHead > 0) {
+            isCurrentLineNeedBr = false
+
             output  += "<h\(nFindHead)>"
             endTags.append("</h\(nFindHead)>")
             pos = advance(pos, nFindHead)
@@ -360,8 +375,9 @@ public class MarkNoteParser: NSObject {
             case "`":
                 let remaining = line.substringFromIndex(advance(start, i + 1))
                 i += scanClosedChar("`",inStr: remaining,tag: "code")
+                isCurrentLineNeedBr = false
+
             case "!":
-                
                 if i >= line.length - 1 || line[advance(start, i + 1)] != "[" {
                     output.append(ch)
                     continue
@@ -382,7 +398,6 @@ public class MarkNoteParser: NSObject {
                     }
                     i +=  posArray[2] + 1
                 }
-
             case "[":
                 let remaining = line.substringFromIndex(advance(start, i + 1))
                 let posArray = MarkNoteParser.detectPositions(["]","(",")"],inStr: remaining)
@@ -399,6 +414,8 @@ public class MarkNoteParser: NSObject {
                     }
                     i +=  posArray[2] + 1
                 }
+            case "\"":
+                output += "&quot;"
             default:
                 //do nothing
                 output.append(ch)

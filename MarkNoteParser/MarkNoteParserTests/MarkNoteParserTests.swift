@@ -119,7 +119,7 @@ class MarkNoteParserTests: XCTestCase {
     func testBulletList()
     {
         let input = "A bulleted list:\n- a\n- b\n- c\n"
-        let expected = "<p>A bulleted list:<ul><li>a</li><li>b</li><li>c</li></ul></p>"
+        let expected = "<p>A bulleted list:<br/><ul><li>a</li><li>b</li><li>c</li></ul></p>"
         let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
         assertHtmlEauql(expected, actual)
     }
@@ -142,7 +142,7 @@ class MarkNoteParserTests: XCTestCase {
     func testHTMLTag(){
         
         let input = "<a name=\"html\"/>"
-        let expected = "<p><a name=\"html\"/></p>"
+        let expected = "<a name=\"html\"/>"
         let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
         assertHtmlEauql(expected, actual)
     }
@@ -150,7 +150,7 @@ class MarkNoteParserTests: XCTestCase {
     func testMixedHTMLTag(){
         
         let input = "<a name=\"html\"/>\n## Inline HTML\nYou can also use raw HTML in your Markdown"
-        let expected = "<p><a name=\"html\"/><h2>Inline HTML</h2>You can also use raw HTML in your Markdown</p>"
+        let expected = "<a name=\"html\"/><h2>Inline HTML</h2><p>You can also use raw HTML in your Markdown</p>"
         let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
         assertHtmlEauql(expected, actual)
     }
