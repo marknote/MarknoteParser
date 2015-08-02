@@ -87,7 +87,7 @@ alert(s);
 </pre>
 
 will be transformed into:
-```
+```html
 <pre class="lang-javascript">
 var s = &quot;JavaScript syntax highlighting&quot;;
 alert(s);

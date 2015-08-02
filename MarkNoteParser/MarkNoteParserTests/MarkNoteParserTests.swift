@@ -97,7 +97,7 @@ class MarkNoteParserTests: XCTestCase {
     func testDoubleEmphasis() {
         assertHtmlEauql("<p><strong>Hello</strong></p>\n", markdown("**Hello**"), "Double Emphasis Asterisk Pass")
         assertHtmlEauql("<p><strong>World</strong></p>\n", markdown("__World__"), "Double Emphasis Underscope Pass")
-        assertHtmlEauql("<p><u>Hello</u></p>\n", markdown("~~Hello~~"), "Double Emphasis Asterisk Pass")
+        assertHtmlEauql("<p><del>Hello</del></p>\n", markdown("~~Hello~~"), "Double Emphasis Asterisk Pass")
        
     }
     
@@ -161,6 +161,14 @@ class MarkNoteParserTests: XCTestCase {
         let expected = "<p>111</p><a href='abc'>123</a><p>222</p>"
         let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
         assertHtmlEauql(expected, actual)
+    }
+    
+    func testEmbeddedHTML(){
+        let input = "<span style='color:red'>Don't modify this note. Your changes will be overrided.</span>"
+        let expected = "<span style='color:red'>Don't modify this note. Your changes will be overrided.</span>"
+        let actual = markdown(input).stringByReplacingOccurrencesOfString("\n", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
+        assertHtmlEauql(expected, actual)
+        
     }
     
     func testHTMLInCode(){

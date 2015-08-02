@@ -24,8 +24,7 @@ public class MarkNoteParser: NSObject {
         instance.output = ""
         instance.parse(input)
         return instance.output
-    }
-    
+    }    
     
     
     func parse (input:String){
@@ -152,7 +151,7 @@ public class MarkNoteParser: NSObject {
                     if line.length > "```".length {
                         //prettyprint javascript prettyprinted
                         let remaining = line.substringFromIndex(advance(line.startIndex, "```".length))
-                        cssClass = "lang-\(remaining)"
+                        cssClass = "prettyprint lang-\(remaining)"
                     }
                     output += "<pre class=\"\(cssClass)\">\n"
                     continue // ignor current line
@@ -366,7 +365,7 @@ public class MarkNoteParser: NSObject {
                 if line[advance(start, i + 1)] == "~" {
                     //possible ~~
                     let remaining = line.substringFromIndex(advance(start, i + 2))
-                    i += scanClosedChar("~~",inStr: remaining,tag: "u") + 1
+                    i += scanClosedChar("~~",inStr: remaining,tag: "del") + 1
                     
                 } else {
                     let remaining = line.substringFromIndex(advance(start, i + 1))
