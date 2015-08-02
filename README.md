@@ -83,22 +83,23 @@ will be transformed into:
 ```
 ### Images
 
-```
-![alt text](http://shuminsun.github.io/images/40.png &quot;Logo Title Text 1&quot;)
+```markdown
+![alt text](https://avatars3.githubusercontent.com/u/12975088?v=3&s=40 "Logo Title")
 ```
 will be transformed into:
-```
-<img src="https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png" title="&quot;Logo Title Text 1&quot;" alt="alt text" />
+```html
+<img src="https://avatars3.githubusercontent.com/u/12975088?v=3&s=40" title="Logo Title" alt="alt text" />
 ```
 ### Code 
 
-<pre>
+<pre class="lang-markdown">
 ```
 var s = "JavaScript syntax highlighting";
 alert(s);
 ```
 </pre>
 
+will be transformed into:
 ```
 <pre class="lang-javascript">
 var s = &quot;JavaScript syntax highlighting&quot;;
@@ -108,7 +109,7 @@ alert(s);
 
 ### Table
 
-```
+```markdown
 | Tables        | Are           | Cool  |
 | ------------- |:-------------:| -----:|
 | col 3 is      | right-aligned | $1600 |
@@ -118,7 +119,7 @@ alert(s);
 
 will be transformed into:
 
-```
+```html
 <table><tr><th> Tables        </th><th> Are           </th><th style="text-align: center;"> Cool </th></tr><tr><td> col 3 is      </td><td> right-aligned </td><td style="text-align: center;"> $1600 </td></tr><tr><td> col 2 is      </td><td> centered      </td><td style="text-align: center;">   $12 </td></tr><tr><td> zebra stripes </td><td> are neat      </td><td style="text-align: center;">    $1 </td></tr></table><p>The outer pipes (|) are optional, and you don&#39;t need to make the raw Markdown line up prettily. You can also use inline Markdown.<br/></p>
 ```
 
