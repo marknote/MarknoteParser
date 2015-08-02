@@ -11,9 +11,9 @@ After trying to find a relevant markdown parser in Swfit/Object-c while no resul
 
 ## Usage
 
-- Cope 2 files into your project:
--- **StringExtensions.swift** , extension of String class;
--- **MarkNoteParser.swift**, the parser class;
+- Cope 2 files into your project:  
+-- **StringExtensions.swift** , extension of String class;  
+-- **MarkNoteParser.swift**, the parser class;  
 
 - Use the method MarkNoteParser.toHtml to convert markdown text to HTML string, like this:
 
@@ -29,28 +29,16 @@ func markdown(input :String)->String{
 
 ### headers
 
-```
+```markdown
 # H1
 ## H2
 ### H3
-#### H4
-##### H5
-###### H6
 
-Alternatively, for H1 and H2, an underline-ish style:
-
-Alt-H1
-======
-
-Alt-H2
-------
-```
+```html
 will be transformed into:
 
 ```
-<h1>H1</h1><h2>H2</h2><h3>H3</h3><h4>H4</h4><h5>H5</h5><h6>H6</h6><p>Alternatively, for H1 and H2, an underline-ish style:<br/></p>
-<h1>Alt-H1</h1>
-<h2>Alt-H2</h2>
+<h1>H1</h1><h2>H2</h2><h3>H3</h3>
 ```
 
 ### Emphasis
