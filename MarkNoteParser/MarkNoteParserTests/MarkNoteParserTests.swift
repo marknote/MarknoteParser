@@ -186,4 +186,10 @@ class MarkNoteParserTests: XCTestCase {
         let actual = markdown(input)
         assertHtmlEauql(expected, actual)
     }
+    
+    func testSplitEmptyLiens(){
+        XCTAssertEqual(["1","","3"],"1\n\n3".componentsSeparatedByString("\n"))
+        XCTAssertEqual(["A bulleted list:","- a","- b","- c",""],"A bulleted list:\n- a\n- b\n- c\n".componentsSeparatedByString("\n"))
+
+    }
 }

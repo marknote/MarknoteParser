@@ -80,7 +80,8 @@ public class MarkNoteParser: NSObject {
         var preProceeded = input.stringByReplacingOccurrencesOfString("\r\n", withString:"\n", options: NSStringCompareOptions.LiteralSearch, range: nil)
         
         
-        let lines = split(preProceeded){$0 == "\n"}
+        //let lines = split(preProceeded){$0 == "\n"}
+        let lines = preProceeded.componentsSeparatedByString("\n")
         var isInCodeBlock:Bool = false
         var blockEndTags = [String]()
         
@@ -96,19 +97,20 @@ public class MarkNoteParser: NSObject {
                 }else {
                     output += line.replaceAll("\"", toStr:"&quot;") + "\n"
                 }
-            } else if bInTable {
+            } else if bInTable && line.length > 0 {
                 handleTableLine(line, isHead:false)
             } else {
                 // not in block
                 if  line.length == 0 {
                     // empty line
-                    closeParagraph()
-                    closeTable()
                     for var i = blockEndTags.count - 1; i >= 0; i-- {
                         output += blockEndTags[i]
                         blockEndTags.removeAtIndex(i)
                     }
                     blockEndTags.removeAll(keepCapacity: false)
+                    closeParagraph()
+                    closeTable()
+                    
                     isAfterEmptyLine = true
                     
                     continue
