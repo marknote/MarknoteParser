@@ -1,6 +1,7 @@
 # MarkNote Parser
 
-A high performance markdown parser implemented in Swift.
+A dead simple markdown parser implemented in Swift with performance in mind.
+Most of markdown parsers highly depend on regular expression while MarkNote Parser avoids doing so.
 
 ## Purpose
 
@@ -21,50 +22,39 @@ func markdown(input :String)->String{
 ```
 
 
-## Status
 
-This parser is in a very early stage yet, and only have some very basic markdown features yet.    
-I am still heavily working on it.
 
-### Features has implemented
+## Features 
 
-The following test cases have been passed:
+### headers
 
-```swift
-func testHeading() {
-        XCTAssertEqual("<h1>Hello</h1>", markdown("# Hello"), "H1 Heading Pass")
-        XCTAssertEqual("<h2>Hello</h2>", markdown("## Hello"), "H2 Heading Pass")
-        XCTAssertEqual("<h3>Hello</h3>", markdown("### Hello"), "H3 Heading Pass")
-        XCTAssertEqual("<h4>Hello</h4>", markdown("#### Hello"), "H4 Heading Pass")
-        XCTAssertEqual("<h5>Hello</h5>", markdown("##### Hello"), "H5 Heading Pass")
-        XCTAssertEqual("<h6>Hello</h6>", markdown("###### Hello"), "H6 Heading Pass")
-    }
-    
-    func testBlockQuote() {
-        XCTAssertEqual("<blockquote><h3>Hello</h3></blockquote>", markdown(">### Hello"), "HRule dashes Pass")
-    }
-    
-    func testInlineCode() {
-        XCTAssertEqual("<code>Hello</code>", markdown("`Hello`\n"), "InlineCode Pass")
-    }
-    
-    func testBlockCode() {
-        XCTAssertEqual("<code>Hello</code>", markdown("``` \r\nHello\r\n```\n"), "BlockCode Pass")
-    }
-    
-    func testDoubleEmphasis() {
-        XCTAssertEqual("<strong>Hello</strong>", markdown("**Hello**"), "Double Emphasis Asterisk Pass")
-        XCTAssertEqual("<strong>World</strong>", markdown("__World__"), "Double Emphasis Underscope Pass")
-    }
-    
-    func testEmphasis() {
-        XCTAssertEqual("<em>Hello</em>", markdown("*Hello*"), "Emphasis Asterisk Pass")
-        XCTAssertEqual("<em>World</em>", markdown("_World_"), "Emphasis Underscope Pass")
-    } 
+
 ```
+# H1
+## H2
+### H3
+#### H4
+##### H5
+###### H6
+
+Alternatively, for H1 and H2, an underline-ish style:
+
+Alt-H1
+======
+
+Alt-H2
+------
+```
+will be transform into:
+<h1>H1</h1><h2>H2</h2><h3>H3</h3><h4>H4</h4><h5>H5</h5><h6>H6</h6><p>Alternatively, for H1 and H2, an underline-ish style:<br/></p>
+<h1>Alt-H1</h1>
+<h2>Alt-H2</h2>
+
+
+
+
+
     
-
-
-
+## Feedback 
 
 If you have any suggestion or feedback, feel free to drop me a message or follow me on [twitter @markmarknote](https://twitter.com/markmarknote)

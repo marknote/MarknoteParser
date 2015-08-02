@@ -39,7 +39,7 @@
 		A9C1B7531B63295C00A89EFD /* MarkNoteParserTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MarkNoteParserTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9C1B7581B63295C00A89EFD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A9C1B7591B63295C00A89EFD /* MarkNoteParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkNoteParserTests.swift; sourceTree = "<group>"; };
-		A9C1B7661B63899E00A89EFD /* StringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
+		A9C1B7661B63899E00A89EFD /* StringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = StringExtensions.swift; path = util/StringExtensions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,8 +81,8 @@
 		A9C1B7401B63295C00A89EFD /* MarkNoteParser */ = {
 			isa = PBXGroup;
 			children = (
+				A9C1B7661B63899E00A89EFD /* StringExtensions.swift */,
 				A9983A831B6A642D00B0AB99 /* MarkNoteParser.swift */,
-				A9C1B7651B63899E00A89EFD /* util */,
 				A9C1B7431B63295C00A89EFD /* AppDelegate.swift */,
 				A9C1B7451B63295C00A89EFD /* ViewController.swift */,
 				A9C1B7471B63295C00A89EFD /* Main.storyboard */,
@@ -116,14 +116,6 @@
 				A9C1B7581B63295C00A89EFD /* Info.plist */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		A9C1B7651B63899E00A89EFD /* util */ = {
-			isa = PBXGroup;
-			children = (
-				A9C1B7661B63899E00A89EFD /* StringExtensions.swift */,
-			);
-			path = util;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
