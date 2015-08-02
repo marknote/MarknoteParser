@@ -125,7 +125,9 @@ public class MarkNoteParser: NSObject {
                     isAfterEmptyLine = false
                 }
                 
-                if line.indexOf("- ") == 0 {
+                if line.indexOf("- ") == 0
+                    || line.indexOf("* ") == 0
+                    || line.indexOf("+ ") == 0 {
                     if self.nCurrentBulletLevel == 0 {
                         output += "<ul>\n"
                         blockEndTags.append("</ul>\n")

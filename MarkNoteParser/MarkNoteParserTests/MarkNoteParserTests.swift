@@ -47,7 +47,7 @@ class MarkNoteParserTests: XCTestCase {
     
     
     func testFencedCode() {
-        assertHtmlEauql("<pre class=\"lang-swift\">println(&quot;Hello&quot;)\n</pre>\n", markdown("```swift\nprintln(\"Hello\")\n```"), "Fenced Code Pass")
+        assertHtmlEauql("<pre class=\"prettyprint lang-swift\">println(&quot;Hello&quot;)\n</pre>\n", markdown("```swift\nprintln(\"Hello\")\n```"), "Fenced Code Pass")
     }
         /*
     func testDefLinks() {
