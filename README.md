@@ -1,6 +1,6 @@
 # MarkNote Parser
 
-A dead simple markdown parser implemented in Swift with performance in mind.
+A dead simple markdown parser implemented in Swift with performance in mind, which can help you to transform markdown code into HTML.    
 Most of markdown parsers highly depend on regular expression while MarkNote Parser avoids doing so.
 
 ## Purpose
@@ -11,7 +11,11 @@ After trying to find a relevant markdown parser in Swfit/Object-c while no resul
 
 ## Usage
 
-Use the method MarkNoteParser.toHtml to convert markdown text to HTML string, like this:
+- Cope 2 files into your project:
+-- **StringExtensions.swift** , extension of String class;
+-- **MarkNoteParser.swift**, the parser class;
+
+- Use the method MarkNoteParser.toHtml to convert markdown text to HTML string, like this:
 
 ```swift
 func markdown(input :String)->String{
@@ -21,13 +25,9 @@ func markdown(input :String)->String{
     }
 ```
 
-
-
-
 ## Features 
 
 ### headers
-
 
 ```
 # H1
@@ -46,6 +46,7 @@ Alt-H2
 ------
 ```
 will be transformed into:
+
 ```
 <h1>H1</h1><h2>H2</h2><h3>H3</h3><h4>H4</h4><h5>H5</h5><h6>H6</h6><p>Alternatively, for H1 and H2, an underline-ish style:<br/></p>
 <h1>Alt-H1</h1>
@@ -54,13 +55,14 @@ will be transformed into:
 
 ### Emphasis
 
-```
+```markdown
 Emphasis, aka italics, with *asterisks* or _underscores_.
 Strong emphasis, aka bold, with **asterisks** or __underscores__.
 Strikethrough uses two tildes. ~~Scratch this.~~
 ```
 will be transformed into:
-```
+
+```html
 <p>Emphasis, aka italics, with <em>asterisks</em> or <em>underscores</em>.<br/></p>
 <p>Strong emphasis, aka bold, with <strong>asterisks</strong> or <strong>underscores</strong>.<br/></p>
 <p>Strikethrough uses two tildes. <u>Scratch this.</u><br/></p>
@@ -68,14 +70,14 @@ will be transformed into:
 
 ### Links
 
-```
+```markdown
 [I&#39;m an inline-style link](https://www.google.com)
 [I&#39;m an inline-style link with title](https://www.google.com &quot;Google&#39;s Homepage&quot;)
 ``` 
 
 will be transformed into:
 
-```
+```html
 <p><a href="https://www.google.com">I&#39;m an inline-style link</a><br/></p>
 <p><a href="https://www.google.com" title="&quot;Google&#39;s Homepage&quot;">I&#39;m an inline-style link with title</a><br/></p>
 ```
