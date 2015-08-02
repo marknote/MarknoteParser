@@ -33,11 +33,10 @@ func markdown(input :String)->String{
 # H1
 ## H2
 ### H3
-
-```html
+```
 will be transformed into:
 
-```
+```html
 <h1>H1</h1><h2>H2</h2><h3>H3</h3>
 ```
 
@@ -59,15 +58,15 @@ will be transformed into:
 ### Links
 
 ```markdown
-[I&#39;m an inline-style link](https://www.google.com)
-[I&#39;m an inline-style link with title](https://www.google.com &quot;Google&#39;s Homepage&quot;)
+[I'm an inline-style link](https://www.google.com)
+[I'm an inline-style link with title](https://www.google.com "Google's Homepage")
 ``` 
 
 will be transformed into:
 
 ```html
-<p><a href="https://www.google.com">I&#39;m an inline-style link</a><br/></p>
-<p><a href="https://www.google.com" title="&quot;Google&#39;s Homepage&quot;">I&#39;m an inline-style link with title</a><br/></p>
+<p><a href="https://www.google.com">I'm an inline-style link</a><br/></p>
+<p><a href="https://www.google.com" title="Google's Homepage">I'm an inline-style link with title</a><br/></p>
 ```
 ### Images
 
