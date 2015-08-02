@@ -187,6 +187,23 @@ class MarkNoteParserTests: XCTestCase {
         assertHtmlEauql(expected, actual)
     }
     
+    func testTableWithoutOuterPipe(){
+        
+        let input = "a|b|c\n------|-----|-----\n1|2|3\n\n\n"
+        let expected = "<table><tr><th>a</th><th>b</th><th>c</th></tr><tr><td>1</td><td>2</td><td>3</td></tr></table>"
+        let actual = markdown(input)
+        assertHtmlEauql(expected, actual)
+    }
+    
+    func testTableWithColumnAignment(){
+        
+        let input = "a|b|c\n------|:-----:|-----:\n1|2|3\n\n\n"
+        let expected = "<table><tr><th>a</th><th style=\"text-align: center;\">b</th><th style=\"text-align: right;\">c</th></tr><tr><td>1</td><td style=\"text-align: center;\">2</td><td style=\"text-align: right;\">3</td></tr></table>"
+        let actual = markdown(input)
+        assertHtmlEauql(expected, actual)
+    }
+
+    
     func testSplitEmptyLiens(){
         XCTAssertEqual(["1","","3"],"1\n\n3".componentsSeparatedByString("\n"))
         XCTAssertEqual(["A bulleted list:","- a","- b","- c",""],"A bulleted list:\n- a\n- b\n- c\n".componentsSeparatedByString("\n"))

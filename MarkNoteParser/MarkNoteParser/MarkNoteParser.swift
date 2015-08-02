@@ -14,6 +14,7 @@ public class MarkNoteParser: NSObject {
     var output = ""
     var isInParagraph = false
     var isAfterEmptyLine = false
+    var tableColsAlignment = [String]()
     let headerChar:Character = "#"
     
     public static func toHtml(input:String) -> String{
@@ -162,7 +163,8 @@ public class MarkNoteParser: NSObject {
                         && line.indexOf("|") >= 0
                         && nextLine.replaceAll("|", toStr: "").replaceAll("-", toStr: "").replaceAll(":", toStr: "").replaceAll(" ", toStr: "").length == 0
                         {
-                            beginTable()
+                            
+                            beginTable(nextLine)
                             handleTableLine(line, isHead:true)
                             i++
                             continue
@@ -192,24 +194,39 @@ public class MarkNoteParser: NSObject {
         
         let cols = split(rawline){$0 == "|"}
         output += "<tr>"
+        var i = 0
+        
         for col in cols {
+            let colAlign = self.tableColsAlignment[i]
             if isHead {
-                output += "<th>"
+                output += colAlign.length > 0 ? "<th \(colAlign)>" : "<th>"
                 parseInLine(col)
                 output += "</th>"
             } else {
-                output += "<td>"
+                output += colAlign.length > 0 ? "<td \(colAlign)>" : "<td>"
                 parseInLine(col)
                 output += "</td>"
             }
+            i++
         }
         output += "</tr>"
     }
     
-    func beginTable(){
+    func beginTable(alignmentLine: String){
         if !bInTable {
             bInTable = true
             output += "<table>"
+            self.tableColsAlignment.removeAll(keepCapacity: false)
+            let arr = alignmentLine.componentsSeparatedByString("|")
+            for col in arr {
+                if col.indexOf(":-") >= 0 && col.indexOf("-:") > 0 {
+                    self.tableColsAlignment.append("style=\"text-align: center;\"")
+                }else if col.indexOf("-:") > 0{
+                    self.tableColsAlignment.append("style=\"text-align: right;\"")
+                }else {
+                    self.tableColsAlignment.append("")
+                }
+            }
         }
     }
     func closeTable(){
@@ -413,7 +430,7 @@ public class MarkNoteParser: NSObject {
             output += ch
         }
         return pos + ch.length 
-    }  
+    }
   
    
 }
