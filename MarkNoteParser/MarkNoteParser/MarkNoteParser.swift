@@ -464,7 +464,7 @@ public class MarkNoteParser: NSObject {
                         var info = ReferenceDefinition()
                         info.key = remaining.substringToIndex(advance(remaining.startIndex,pos ))
                         let remaining2 = remaining.substringFromIndex(advance(remaining.startIndex,pos + "]:".length ))
-                        let arr = MarkNoteParser.splitStringWithMidSpace(remaining2)//.componentsSeparatedByString(" ")
+                        let arr = MarkNoteParser.splitStringWithMidSpace(remaining2)
                         if count(arr) > 1 {
                             info.url = arr[0].lowercaseString
                             info.title = arr[1].replaceAll("\"", toStr: "")
