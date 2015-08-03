@@ -49,10 +49,10 @@ public class MarkNoteParser: NSObject {
                     }
                 case .Image:
                     if found.title.length > 0 {
-                        actual = "<img src=\"\(found.url)\" title=\"\(found.title)\">\(refer.title)</img>"
+                        actual = "<img src=\"\(found.url)\" alt=\"\(refer.title)\" title=\"\(found.title)\"/>"
 
                     } else {
-                        actual = "<img src=\"\(found.url)\">\(refer.title)</img>"
+                        actual = "<img src=\"\(found.url)\" alt=\"\(refer.title)\"/>"
                     }
                 }
                 output = output.replaceAll(refer.placeHolder(), toStr: actual)
@@ -424,6 +424,38 @@ public class MarkNoteParser: NSObject {
                         output += "<img src=\"\(url)\" alt=\"\(title)\" />"
                     }
                     i +=  posArray[2] + 1
+                }else {
+                    // check reference defintion
+                    let pos = remaining.indexOf("]:")
+                    if pos > 0 && pos < remaining.length - "]:".length {
+                        // is reference definition
+                        var info = ReferenceDefinition()
+                        info.key = remaining.substringToIndex(advance(remaining.startIndex,pos ))
+                        let remaining2 = remaining.substringFromIndex(advance(remaining.startIndex,pos + "]:".length ))
+                        let arr = remaining2.componentsSeparatedByString(" ")
+                        if count(arr) > 1 {
+                            info.url = arr[0].lowercaseString
+                            info.title = arr[1].replaceAll("\"", toStr: "")
+                        } else {
+                            info.url = arr[0].lowercaseString
+                        }
+                        self.arrReferenceInfo.append(info)
+                        i += pos + "]:".length + remaining2.length
+                    } else {
+                        let posArray2 = MarkNoteParser.detectPositions(["]","[","]"],inStr: remaining)
+                        if posArray2.count == 3 {
+                            //is reference usage
+                            let title = line.substring(i + 1, end: i + 1 + posArray2[0] - 1)
+                            let url = line.substring( i + 1 + posArray2[1] + 1, end: i + 1 + posArray2[2] - 1)
+                            var refer = ReferenceUsageInfo()
+                            refer.type = .Image
+                            refer.key = url.lowercaseString
+                            refer.title = title
+                            self.arrReferenceUsage.append(refer)
+                            output += refer.placeHolder()
+                            i +=  pos + posArray2[2] + 1 + 1
+                        }
+                    }
                 }
             case "[":
                 let remaining = line.substringFromIndex(advance(start, i + 1))
@@ -463,7 +495,6 @@ public class MarkNoteParser: NSObject {
                             //is reference usage
                             let title = line.substring(i + 1, end: i + 1 + posArray2[0] - 1)
                             let url = line.substring( i + 1 + posArray2[1] + 1, end: i + 1 + posArray2[2] - 1)
-                            //let posSpace = url.indexOf(" ")
                             var refer = ReferenceUsageInfo()
                             refer.type = .Link
                             refer.key = url.lowercaseString

@@ -55,6 +55,11 @@ class MarkNoteParserTests: XCTestCase {
         assertHtmlEauql("<p><a href=\"www.google.com\" title=\"GoogleSearch\">text</a><br/><br/></p>", markdown("[text][Google]\n[Google]:www.google.com \"GoogleSearch\"\n"), "Deflink no title Pass")
     }
     
+    func testDefImages() {
+        assertHtmlEauql("<p><img src=\"aaa\" alt=\"Title\"/><br/><br/></p>", markdown("![Title][image]\n [image]:aaa\n"), "Deflink no title Pass")
+        assertHtmlEauql("<p><img src=\"aaa\" alt=\"text\" title=\"TTTT\"/><br/><br/></p>", markdown("![text][image]\n[image]:aaa \"TTTT\"\n"), "Deflink no title Pass")
+    }
+    
     func testInlineLinks() {
         assertHtmlEauql("<p><a href=\"www.google.com\">Google</a></p>\n", markdown("[Google](www.google.com)"), "inline link Pass")
         assertHtmlEauql("<p><a href=\"www.google.com\" title=\"googlehome\">Google</a></p>\n", markdown("[Google](www.google.com \"googlehome\")"), "inline link Pass")
