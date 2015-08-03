@@ -58,7 +58,10 @@ class MarkNoteParserTests: XCTestCase {
     func testDefImages() {
         assertHtmlEauql("<p><img src=\"aaa\" alt=\"Title\"/><br/><br/></p>", markdown("![Title][image]\n [image]:aaa\n"), "Deflink no title Pass")
         assertHtmlEauql("<p><img src=\"aaa\" alt=\"text\" title=\"TTTT\"/><br/><br/></p>", markdown("![text][image]\n[image]:aaa \"TTTT\"\n"), "Deflink no title Pass")
+        assertHtmlEauql("<p><img src=\"https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png\" alt=\"alt text\" title=\"Logo Title Text\"/><br/></p>", markdown("![alt text][logo]\n[logo]: https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png \"Logo Title Text\""), "Deflink no title Pass")
     }
+    
+    
     
     func testInlineLinks() {
         assertHtmlEauql("<p><a href=\"www.google.com\">Google</a></p>\n", markdown("[Google](www.google.com)"), "inline link Pass")
@@ -221,5 +224,9 @@ class MarkNoteParserTests: XCTestCase {
         XCTAssertEqual(["1","","3"],"1\n\n3".componentsSeparatedByString("\n"))
         XCTAssertEqual(["A bulleted list:","- a","- b","- c",""],"A bulleted list:\n- a\n- b\n- c\n".componentsSeparatedByString("\n"))
 
+    }
+    
+    func testSplitStringWithMidSpace(){
+        XCTAssertEqual(["1","2"], MarkNoteParser.splitStringWithMidSpace("1 2") )
     }
 }

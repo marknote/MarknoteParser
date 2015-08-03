@@ -425,24 +425,8 @@ public class MarkNoteParser: NSObject {
                     }
                     i +=  posArray[2] + 1
                 }else {
-                    // check reference defintion
-                    let pos = remaining.indexOf("]:")
-                    if pos > 0 && pos < remaining.length - "]:".length {
-                        // is reference definition
-                        var info = ReferenceDefinition()
-                        info.key = remaining.substringToIndex(advance(remaining.startIndex,pos ))
-                        let remaining2 = remaining.substringFromIndex(advance(remaining.startIndex,pos + "]:".length ))
-                        let arr = remaining2.componentsSeparatedByString(" ")
-                        if count(arr) > 1 {
-                            info.url = arr[0].lowercaseString
-                            info.title = arr[1].replaceAll("\"", toStr: "")
-                        } else {
-                            info.url = arr[0].lowercaseString
-                        }
-                        self.arrReferenceInfo.append(info)
-                        i += pos + "]:".length + remaining2.length
-                    } else {
-                        let posArray2 = MarkNoteParser.detectPositions(["]","[","]"],inStr: remaining)
+                    // check image reference defintion
+                    let posArray2 = MarkNoteParser.detectPositions(["]","[","]"],inStr: remaining)
                         if posArray2.count == 3 {
                             //is reference usage
                             let title = line.substring(i + 1, end: i + 1 + posArray2[0] - 1)
@@ -453,10 +437,10 @@ public class MarkNoteParser: NSObject {
                             refer.title = title
                             self.arrReferenceUsage.append(refer)
                             output += refer.placeHolder()
-                            i +=  pos + posArray2[2] + 1 + 1
+                            i += posArray2[2] + 1 + 1
                         }
                     }
-                }
+                
             case "[":
                 let remaining = line.substringFromIndex(advance(start, i + 1))
                 let posArray = MarkNoteParser.detectPositions(["]","(",")"],inStr: remaining)
@@ -480,7 +464,7 @@ public class MarkNoteParser: NSObject {
                         var info = ReferenceDefinition()
                         info.key = remaining.substringToIndex(advance(remaining.startIndex,pos ))
                         let remaining2 = remaining.substringFromIndex(advance(remaining.startIndex,pos + "]:".length ))
-                        let arr = remaining2.componentsSeparatedByString(" ")
+                        let arr = MarkNoteParser.splitStringWithMidSpace(remaining2)//.componentsSeparatedByString(" ")
                         if count(arr) > 1 {
                             info.url = arr[0].lowercaseString
                             info.title = arr[1].replaceAll("\"", toStr: "")
@@ -538,6 +522,18 @@ public class MarkNoteParser: NSObject {
             output += ch
         }
         return pos + ch.length 
+    }
+    public class func splitStringWithMidSpace(input: String) -> [String]{
+        var array = [String]()
+        let trimmed = input.trim()
+        let pos = trimmed.indexOf(" ")
+        if pos > 0 {
+            array.append(trimmed.substringToIndex(advance(trimmed.startIndex, pos)))
+            array.append(trimmed.substringFromIndex(advance(trimmed.startIndex, pos + 1)))
+        } else {
+            array.append(trimmed)
+        }
+        return array
     }
    
 }
