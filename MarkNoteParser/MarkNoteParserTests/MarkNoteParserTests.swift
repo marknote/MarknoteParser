@@ -49,11 +49,11 @@ class MarkNoteParserTests: XCTestCase {
     func testFencedCode() {
         assertHtmlEauql("<pre class=\"prettyprint lang-swift\">println(&quot;Hello&quot;)\n</pre>\n", markdown("```swift\nprintln(\"Hello\")\n```"), "Fenced Code Pass")
     }
-        /*
+    
     func testDefLinks() {
-        assertHtmlEauql("<a href=\"www.google.com\">Google</a>", markdown("[Google][]\n\n [Google]:www.google.com\n"), "Deflink no title Pass")
-        assertHtmlEauql("<a href=\"www.google.com\" title=\"GoogleSearch\">Google</a>", markdown("[Google][]\n\n [Google]:www.google.com \"GoogleSearch\"\n"), "Deflink no title Pass")
-    }*/
+        assertHtmlEauql("<p><a href=\"www.google.com\">Title</a><br/><br/></p>", markdown("[Title][Google]\n [Google]:www.google.com\n"), "Deflink no title Pass")
+        assertHtmlEauql("<p><a href=\"www.google.com\" title=\"GoogleSearch\">text</a><br/><br/></p>", markdown("[text][Google]\n[Google]:www.google.com \"GoogleSearch\"\n"), "Deflink no title Pass")
+    }
     
     func testInlineLinks() {
         assertHtmlEauql("<p><a href=\"www.google.com\">Google</a></p>\n", markdown("[Google](www.google.com)"), "inline link Pass")

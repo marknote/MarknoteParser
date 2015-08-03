@@ -18,6 +18,8 @@ public class MarkNoteParser: NSObject {
     let headerChar:Character = "#"
     var blockEndTags = [String]()
     var isCurrentLineNeedBr = true
+    var arrReferenceInfo = [ReferenceDefinition]()
+    var arrReferenceUsage = [ReferenceUsageInfo]()
     
     public static func toHtml(input:String) -> String{
         var instance = MarkNoteParser()
@@ -29,6 +31,33 @@ public class MarkNoteParser: NSObject {
     
     func parse (input:String){
         proceedHTMLTags(input)
+        proceedReference()
+    }
+    
+    func proceedReference(){
+        for refer in self.arrReferenceUsage {
+            let hitted = arrReferenceInfo.filter{ $0.key.lowercaseString == refer.key.lowercaseString }
+            if count(hitted) > 0 {
+                let found = hitted[0]
+                var actual = ""
+                switch refer.type {
+                case .Link:
+                    if found.title.length > 0 {
+                        actual = "<a href=\"\(found.url)\" title=\"\(found.title)\">\(refer.title)</a>"
+                    } else {
+                        actual = "<a href=\"\(found.url)\">\(refer.title)</a>"
+                    }
+                case .Image:
+                    if found.title.length > 0 {
+                        actual = "<img src=\"\(found.url)\" title=\"\(found.title)\">\(refer.title)</img>"
+
+                    } else {
+                        actual = "<img src=\"\(found.url)\">\(refer.title)</img>"
+                    }
+                }
+                output = output.replaceAll(refer.placeHolder(), toStr: actual)
+            }
+        }
     }
     
     
@@ -115,11 +144,8 @@ public class MarkNoteParser: NSObject {
                     closeTags()
                     closeParagraph()
                     closeTable()
-                    
                     isAfterEmptyLine = true
                     isCurrentLineNeedBr = false
-
-                    
                     continue
                 }else {
                     isAfterEmptyLine = false
@@ -414,6 +440,39 @@ public class MarkNoteParser: NSObject {
                         output += "<a href=\"" + url + "\">" + title + "</a>"
                     }
                     i +=  posArray[2] + 1
+                }else {
+                    // check reference defintion
+                    let pos = remaining.indexOf("]:")
+                    if pos > 0 && pos < remaining.length - "]:".length {
+                        // is reference definition
+                        var info = ReferenceDefinition()
+                        info.key = remaining.substringToIndex(advance(remaining.startIndex,pos ))
+                        let remaining2 = remaining.substringFromIndex(advance(remaining.startIndex,pos + "]:".length ))
+                        let arr = remaining2.componentsSeparatedByString(" ")
+                        if count(arr) > 1 {
+                            info.url = arr[0].lowercaseString
+                            info.title = arr[1].replaceAll("\"", toStr: "")
+                        } else {
+                            info.url = arr[0].lowercaseString
+                        }
+                        self.arrReferenceInfo.append(info)
+                        i += pos + "]:".length + remaining2.length
+                    } else {
+                        let posArray2 = MarkNoteParser.detectPositions(["]","[","]"],inStr: remaining)
+                        if posArray2.count == 3 {
+                            //is reference usage
+                            let title = line.substring(i + 1, end: i + 1 + posArray2[0] - 1)
+                            let url = line.substring( i + 1 + posArray2[1] + 1, end: i + 1 + posArray2[2] - 1)
+                            //let posSpace = url.indexOf(" ")
+                            var refer = ReferenceUsageInfo()
+                            refer.type = .Link
+                            refer.key = url.lowercaseString
+                            refer.title = title
+                            self.arrReferenceUsage.append(refer)
+                            output += refer.placeHolder()
+                            i +=  pos + posArray2[2] + 1 + 1
+                        }
+                    }
                 }
             case "\"":
                 output += "&quot;"
@@ -449,6 +508,23 @@ public class MarkNoteParser: NSObject {
         }
         return pos + ch.length 
     }
-  
    
+}
+enum ReferenceType{
+    case Link
+    case Image
+}
+
+class ReferenceDefinition {
+    var title = ""
+    var key = ""
+    var url = ""
+}
+class ReferenceUsageInfo{
+    var title = ""
+    var key = ""
+    var type = ReferenceType.Link
+    func placeHolder() -> String{
+        return "ReferenceUsageInfo\(key)\(title)"
+    }
 }
