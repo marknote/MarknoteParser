@@ -42,14 +42,14 @@ public class MarkNoteParser: NSObject {
                 var actual = ""
                 switch refer.type {
                 case .Link:
-                    if found.title.length > 0 {
-                        actual = "<a href=\"\(found.url)\" title=\"\(found.title)\">\(refer.title)</a>"
+                    if found.url._title.length > 0 {
+                        actual = "<a href=\"\(found.url)\" title=\"\(found.url._title)\">\(refer.title)</a>"
                     } else {
                         actual = "<a href=\"\(found.url)\">\(refer.title)</a>"
                     }
                 case .Image:
-                    if found.title.length > 0 {
-                        actual = "<img src=\"\(found.url)\" alt=\"\(refer.title)\" title=\"\(found.title)\"/>"
+                    if found.url._title.length > 0 {
+                        actual = "<img src=\"\(found.url)\" alt=\"\(refer.title)\" title=\"\(found.url._title)\"/>"
 
                     } else {
                         actual = "<img src=\"\(found.url)\" alt=\"\(refer.title)\"/>"
@@ -413,16 +413,11 @@ public class MarkNoteParser: NSObject {
                 let remaining = line.substringFromIndex(advance(start, i + 1))
                 let posArray = MarkNoteParser.detectPositions(["]","(",")"],inStr: remaining)
                 if posArray.count == 3 {
-                    let title = line.substring(i + 1, end: i + 1 + posArray[0] - 1)
-                    let url = line.substring( i + 1 + posArray[1] + 1, end: i + 1 + posArray[2] - 1)
-                    let posSpace = url.indexOf(" ")
-                    if posSpace > 0 {
-                        let urlBody = url.substring(0, end: posSpace - 1)
-                        let urlTile = url.substringFromIndex(advance(url.startIndex, posSpace + 1))
-                        output += "<img src=\"\(urlBody)\" title=\"" + urlTile.replaceAll("\"", toStr: "") + "\" alt=\"\(title)\" />"
-                    } else {
-                        output += "<img src=\"\(url)\" alt=\"\(title)\" />"
-                    }
+                    var img = ImageTag()
+                    img.alt = line.substring(i + 1, end: i + 1 + posArray[0] - 1)
+                    img.url = URLTag(url: line.substring( i + 1 + posArray[1] + 1, end: i + 1 + posArray[2] - 1)
+                                        )
+                    output += img.toHtml()
                     i +=  posArray[2] + 1
                 }else {
                     // check image reference defintion
@@ -445,16 +440,10 @@ public class MarkNoteParser: NSObject {
                 let remaining = line.substringFromIndex(advance(start, i + 1))
                 let posArray = MarkNoteParser.detectPositions(["]","(",")"],inStr: remaining)
                 if posArray.count == 3 {
-                    let title = line.substring(i + 1, end: i + 1 + posArray[0] - 1)
-                    let url = line.substring( i + 1 + posArray[1] + 1, end: i + 1 + posArray[2] - 1)
-                    let posSpace = url.indexOf(" ")
-                    if posSpace > 0 {
-                        let urlBody = url.substring(0, end: posSpace - 1)
-                        let urlTile = url.substringFromIndex(advance(url.startIndex, posSpace + 1))
-                        output += "<a href=\"" + urlBody + "\" title=\"" + urlTile.replaceAll("\"", toStr: "") + "\">" + title + "</a>"
-                    } else {
-                        output += "<a href=\"" + url + "\">" + title + "</a>"
-                    }
+                    var link = LinkTag()
+                    link.text = line.substring(i + 1, end: i + 1 + posArray[0] - 1)
+                    link.url = URLTag(url: line.substring( i + 1 + posArray[1] + 1, end: i + 1 + posArray[2] - 1))
+                    output += link.toHtml()
                     i +=  posArray[2] + 1
                 }else {
                     // check reference defintion
@@ -464,13 +453,7 @@ public class MarkNoteParser: NSObject {
                         var info = ReferenceDefinition()
                         info.key = remaining.substringToIndex(advance(remaining.startIndex,pos ))
                         let remaining2 = remaining.substringFromIndex(advance(remaining.startIndex,pos + "]:".length ))
-                        let arr = MarkNoteParser.splitStringWithMidSpace(remaining2)
-                        if count(arr) > 1 {
-                            info.url = arr[0].lowercaseString
-                            info.title = arr[1].replaceAll("\"", toStr: "")
-                        } else {
-                            info.url = arr[0].lowercaseString
-                        }
+                        info.url = URLTag(url: remaining2)
                         self.arrReferenceInfo.append(info)
                         i += pos + "]:".length + remaining2.length
                     } else {
@@ -542,10 +525,56 @@ enum ReferenceType{
     case Image
 }
 
+class URLTag: NSObject, Printable {
+    var _url = ""
+    var _title = ""
+    init(url:String){
+        let trimmed = url.trim()
+        //let posSpace = trimmed.indexOf(" ")
+        let arr = MarkNoteParser.splitStringWithMidSpace(trimmed)
+        if count(arr) > 1 {
+            _url = arr[0].lowercaseString
+            _title = arr[1].replaceAll("\"", toStr: "")
+        } else {
+            _url = arr[0].lowercaseString
+        }
+
+    }
+    override var description: String {
+        return _url
+    }
+}
+
+class LinkTag {
+    var text = ""
+    var url = URLTag(url:"")
+    func toHtml()-> String{
+        if url._title.length > 0 {
+            return "<a href=\"\(url._url)\" title=\"\(url._title)\">" + text + "</a>"
+        } else {
+            return "<a href=\"\(url._url)\">" + text + "</a>"
+        }
+    }
+}
+
+class ImageTag{
+    
+    var alt = ""
+    var url = URLTag(url:"")
+    func toHtml()-> String{
+        if url._title.length > 0 {
+            return "<img=\"\(url._url)\" alt=\"\(alt)\" title=\"\(url._title)\" />"
+        } else {
+            return "<img src=\"\(url._url)\" alt=\"\(alt)\" />"
+        }
+    }
+}
+
 class ReferenceDefinition {
-    var title = ""
+    //var title = ""
     var key = ""
-    var url = ""
+    //var url = ""
+    var url = URLTag(url:"")
 }
 class ReferenceUsageInfo{
     var title = ""
