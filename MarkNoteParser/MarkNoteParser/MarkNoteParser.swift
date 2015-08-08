@@ -355,49 +355,25 @@ public class MarkNoteParser: NSObject {
         let len = line.length
         let start = line.startIndex
         for var i = 0; i < len ; i++ {
-            let ch = line[advance(start, i)]
+            let ch:Character = line[advance(start, i)]
             
             switch ch {
-            case "*":
+            case "*","_","~":
                 if (i + 1 > len - 1) {
                     output.append(ch)
                     return
+                }                
+                var strong = "strong"
+                if ch == "~" {
+                    strong = "del"
                 }
-                if line[advance(start, i + 1)] == "*" {
+                if line[advance(start, i + 1)] == ch {
                     //possible **
                     let remaining = line.substringFromIndex(advance(start, i + 2))
-                    i += scanClosedChar("**",inStr: remaining,tag: "strong") + 1
+                    i += scanClosedChar(MarkNoteParser.charArray(ch, len: 2),inStr: remaining,tag: strong) + 1
                 } else {
                     let remaining = line.substringFromIndex(advance(start, i + 1))
-                    i += scanClosedChar("*",inStr: remaining,tag: "em")
-                }
-            case "_":
-                if (i + 1 > len - 1) {
-                    self.output.append(ch)
-                    return 
-                }
-                if line[advance(start, i + 1)] == "_" {
-                    //possible __
-                    let remaining = line.substringFromIndex(advance(start, i + 2))
-                    i += scanClosedChar("__",inStr: remaining,tag: "strong") + 1
-
-                } else {
-                    let remaining = line.substringFromIndex(advance(start, i + 1))
-                    i += scanClosedChar("_",inStr: remaining,tag: "em")
-                }
-            case "~":
-                if (i + 1 > len - 1) {
-                    self.output.append(ch)
-                    return
-                }
-                if line[advance(start, i + 1)] == "~" {
-                    //possible ~~
-                    let remaining = line.substringFromIndex(advance(start, i + 2))
-                    i += scanClosedChar("~~",inStr: remaining,tag: "del") + 1
-                    
-                } else {
-                    let remaining = line.substringFromIndex(advance(start, i + 1))
-                    i += scanClosedChar("~",inStr: remaining,tag: "em")
+                    i += scanClosedChar("\(ch)",inStr: remaining,tag: "em")
                 }
             case "`":
                 let remaining = line.substringFromIndex(advance(start, i + 1))
@@ -479,6 +455,14 @@ public class MarkNoteParser: NSObject {
                 output.append(ch)
             }        
         }
+    }
+    
+    public static func charArray(ch:Character, len:Int)->String{
+        var str = ""
+        for var i = 0 ; i < len ; i++ {
+            str.append(ch)
+        }
+        return str
     }
     
     public static func detectPositions(toFind:[String],inStr:String )->[Int]{
@@ -571,9 +555,7 @@ class ImageTag{
 }
 
 class ReferenceDefinition {
-    //var title = ""
     var key = ""
-    //var url = ""
     var url = URLTag(url:"")
 }
 class ReferenceUsageInfo{
