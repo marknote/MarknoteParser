@@ -362,7 +362,7 @@ public class MarkNoteParser: NSObject {
                 if (i + 1 > len - 1) {
                     output.append(ch)
                     return
-                }                
+                }
                 var strong = "strong"
                 if ch == "~" {
                     strong = "del"
