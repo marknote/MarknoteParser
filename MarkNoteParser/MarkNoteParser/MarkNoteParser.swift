@@ -22,7 +22,7 @@ public class MarkNoteParser: NSObject {
     var arrReferenceUsage = [ReferenceUsageInfo]()
     
     public static func toHtml(input:String) -> String{
-        var instance = MarkNoteParser()
+        let instance = MarkNoteParser()
         instance.output = ""
         instance.parse(input)
         return instance.output
@@ -37,7 +37,7 @@ public class MarkNoteParser: NSObject {
     func proceedReference(){
         for refer in self.arrReferenceUsage {
             let hitted = arrReferenceInfo.filter{ $0.key.lowercaseString == refer.key.lowercaseString }
-            if count(hitted) > 0 {
+            if hitted.count > 0 {
                 let found = hitted[0]
                 var actual = ""
                 switch refer.type {
@@ -63,7 +63,7 @@ public class MarkNoteParser: NSObject {
     
     func proceedHTMLTags(input:String){
         var currentPos = 0
-        var tagBegin = input.indexOf("<")
+        let tagBegin = input.indexOf("<")
         if tagBegin >= 0 {
             if tagBegin >= 1 {
                 proceedNoHtml(input.substring(currentPos, end: tagBegin - 1))
@@ -112,7 +112,7 @@ public class MarkNoteParser: NSObject {
         }
     }
     func proceedNoHtml (input:String){
-        var preProceeded = input.replaceAll("\r\n", toStr: "\n").replaceAll("\n", toStr:"  \n")
+        let preProceeded = input.replaceAll("\r\n", toStr: "\n").replaceAll("\n", toStr:"  \n")
         
         
         //let lines = split(preProceeded){$0 == "\n"}
@@ -225,7 +225,7 @@ public class MarkNoteParser: NSObject {
     
     func handleTableLine(rawline:String, isHead:Bool) {
         
-        let cols = split(rawline){$0 == "|"}
+        let cols = rawline.characters.split{$0 == "|"}.map { String($0) }
         output += "<tr>"
         var i = 0
         
@@ -295,7 +295,7 @@ public class MarkNoteParser: NSObject {
     func calculateHeadLevel(line:String)->Int{
         var nFindHead = 0
         var pos: String.Index = line.startIndex
-        for var i = 0; i <= 6 && i < count(line); i++ {
+        for var i = 0; i <= 6 && i < line.characters.count; i++ {
             pos = advance(line.startIndex,i)
             if line[pos] == headerChar  {
                 nFindHead = i + 1
@@ -326,7 +326,7 @@ public class MarkNoteParser: NSObject {
             endTags.append("</blockquote>")
         }
         
-        var nFindHead = calculateHeadLevel(line)
+        let nFindHead = calculateHeadLevel(line)
         if (nFindHead > 0) {
             isCurrentLineNeedBr = false
 
@@ -339,7 +339,7 @@ public class MarkNoteParser: NSObject {
      
         //line = this.handleImage(line, sb)
         
-        var remaining = line.substringFromIndex(pos).trim()
+        let remaining = line.substringFromIndex(pos).trim()
         parseInLine(remaining)
         //output += "\n"
         
@@ -389,7 +389,7 @@ public class MarkNoteParser: NSObject {
                 let remaining = line.substringFromIndex(advance(start, i + 1))
                 let posArray = MarkNoteParser.detectPositions(["]","(",")"],inStr: remaining)
                 if posArray.count == 3 {
-                    var img = ImageTag()
+                    let img = ImageTag()
                     img.alt = line.substring(i + 1, end: i + 1 + posArray[0] - 1)
                     img.url = URLTag(url: line.substring( i + 1 + posArray[1] + 1, end: i + 1 + posArray[2] - 1)
                                         )
@@ -402,7 +402,7 @@ public class MarkNoteParser: NSObject {
                             //is reference usage
                             let title = line.substring(i + 1, end: i + 1 + posArray2[0] - 1)
                             let url = line.substring( i + 1 + posArray2[1] + 1, end: i + 1 + posArray2[2] - 1)
-                            var refer = ReferenceUsageInfo()
+                            let refer = ReferenceUsageInfo()
                             refer.type = .Image
                             refer.key = url.lowercaseString
                             refer.title = title
@@ -416,7 +416,7 @@ public class MarkNoteParser: NSObject {
                 let remaining = line.substringFromIndex(advance(start, i + 1))
                 let posArray = MarkNoteParser.detectPositions(["]","(",")"],inStr: remaining)
                 if posArray.count == 3 {
-                    var link = LinkTag()
+                    let link = LinkTag()
                     link.text = line.substring(i + 1, end: i + 1 + posArray[0] - 1)
                     link.url = URLTag(url: line.substring( i + 1 + posArray[1] + 1, end: i + 1 + posArray[2] - 1))
                     output += link.toHtml()
@@ -426,7 +426,7 @@ public class MarkNoteParser: NSObject {
                     let pos = remaining.indexOf("]:")
                     if pos > 0 && pos < remaining.length - "]:".length {
                         // is reference definition
-                        var info = ReferenceDefinition()
+                        let info = ReferenceDefinition()
                         info.key = remaining.substringToIndex(advance(remaining.startIndex,pos ))
                         let remaining2 = remaining.substringFromIndex(advance(remaining.startIndex,pos + "]:".length ))
                         info.url = URLTag(url: remaining2)
@@ -438,7 +438,7 @@ public class MarkNoteParser: NSObject {
                             //is reference usage
                             let title = line.substring(i + 1, end: i + 1 + posArray2[0] - 1)
                             let url = line.substring( i + 1 + posArray2[1] + 1, end: i + 1 + posArray2[2] - 1)
-                            var refer = ReferenceUsageInfo()
+                            let refer = ReferenceUsageInfo()
                             refer.type = .Link
                             refer.key = url.lowercaseString
                             refer.title = title
@@ -509,14 +509,14 @@ enum ReferenceType{
     case Image
 }
 
-class URLTag: NSObject, Printable {
+class URLTag: NSObject {
     var _url = ""
     var _title = ""
     init(url:String){
         let trimmed = url.trim()
         //let posSpace = trimmed.indexOf(" ")
         let arr = MarkNoteParser.splitStringWithMidSpace(trimmed)
-        if count(arr) > 1 {
+        if arr.count > 1 {
             _url = arr[0].lowercaseString
             _title = arr[1].replaceAll("\"", toStr: "")
         } else {

@@ -9,15 +9,15 @@ extension String {
     /**
     Returns the length of the string.
     
-    :returns: Int length of the string.
+    - returns: Int length of the string.
     */
     
     var length: Int {
-        return count(self)
+        return self.characters.count
     }
     
     var objcLength: Int {
-        return count(self.utf16)
+        return self.utf16.count
     }
     
     //MARK: - Linguistics
@@ -27,7 +27,7 @@ extension String {
     
     NOTE: String has to be at least 4 characters, otherwise the method will return nil.
     
-    :returns: String! Returns a string representing the langague of the string (e.g. en, fr, or und for undefined).
+    - returns: String! Returns a string representing the langague of the string (e.g. en, fr, or und for undefined).
     */
     func detectLanguage() -> String? {
         if self.length > 4 {
@@ -41,7 +41,7 @@ extension String {
     /**
     Returns the script of a String
     
-    :returns: String! returns a string representing the script of the String (e.g. Latn, Hans).
+    - returns: String! returns a string representing the script of the String (e.g. Latn, Hans).
     */
     func detectScript() -> String? {
         if self.length > 1 {
@@ -57,7 +57,7 @@ extension String {
     
     NOTE: String has to be at least 4 characters, otherwise the method will return false.
     
-    :returns: Bool The Bool will return true if the string was writting in a right to left langague (e.g. Arabic, Hebrew)
+    - returns: Bool The Bool will return true if the string was writting in a right to left langague (e.g. Arabic, Hebrew)
     
     */
     var isRightToLeft : Bool {
@@ -71,7 +71,7 @@ extension String {
     /**
     Check that a String is only made of white spaces, and new line characters.
     
-    :returns: Bool
+    - returns: Bool
     */
     func isOnlyEmptySpacesAndNewLineCharacters() -> Bool {
         return self.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet()).length == 0
@@ -80,10 +80,15 @@ extension String {
     /**
     Checks if a string is an email address using NSDataDetector.
     
-    :returns: Bool
+    - returns: Bool
     */
     var isEmail: Bool {
-        let dataDetector = NSDataDetector(types: NSTextCheckingType.Link.rawValue, error: nil)
+            let dataDetector: NSDataDetector?
+            do {
+                dataDetector = try NSDataDetector(types: NSTextCheckingType.Link.rawValue)
+            } catch _ {
+                dataDetector = nil
+            }
         let firstMatch = dataDetector?.firstMatchInString(self, options: NSMatchingOptions.ReportCompletion, range: NSMakeRange(0, length))
         
         return (firstMatch?.range.location != NSNotFound && firstMatch?.URL?.scheme == "mailto")
@@ -92,7 +97,7 @@ extension String {
     /**
     Check that a String is 'tweetable' can be used in a tweet.
     
-    :returns: Bool
+    - returns: Bool
     */
     func isTweetable() -> Bool {
         let tweetLength = 140,
@@ -103,36 +108,46 @@ extension String {
         if linksLength != 0 {
             return remaining < 0
         } else {
-            return !(count(self.utf16) > tweetLength || count(self.utf16) == 0 || self.isOnlyEmptySpacesAndNewLineCharacters())
+            return !(self.utf16.count > tweetLength || self.utf16.count == 0 || self.isOnlyEmptySpacesAndNewLineCharacters())
         }
     }
     
     /**
     Gets an array of Strings for all links found in a String
     
-    :returns: [String]
+    - returns: [String]
     */
     func getLinks() -> [String] {
-        let detector = NSDataDetector(types: NSTextCheckingType.Link.rawValue, error: nil)
+        let detector: NSDataDetector?
+        do {
+            detector = try NSDataDetector(types: NSTextCheckingType.Link.rawValue)
+        } catch _ {
+            detector = nil
+        }
         
-        let links = detector?.matchesInString(self, options: NSMatchingOptions.ReportCompletion, range: NSMakeRange(0, length)).map {$0 as! NSTextCheckingResult}
+        let links = detector?.matchesInString(self, options: NSMatchingOptions.ReportCompletion, range: NSMakeRange(0, length)).map {$0 }
         
         return links!.filter { link in
             return link.URL != nil
             }.map { link -> String in
-                return link.URL!.absoluteString!
+                return link.URL!.absoluteString
         }
     }
     
     /**
     Gets an array of URLs for all links found in a String
     
-    :returns: [NSURL]
+    - returns: [NSURL]
     */
     func getURLs() -> [NSURL] {
-        let detector = NSDataDetector(types: NSTextCheckingType.Link.rawValue, error: nil)
+        let detector: NSDataDetector?
+        do {
+            detector = try NSDataDetector(types: NSTextCheckingType.Link.rawValue)
+        } catch _ {
+            detector = nil
+        }
         
-        let links = detector?.matchesInString(self, options: NSMatchingOptions.ReportCompletion, range: NSMakeRange(0, length)).map {$0 as! NSTextCheckingResult}
+        let links = detector?.matchesInString(self, options: NSMatchingOptions.ReportCompletion, range: NSMakeRange(0, length)).map {$0 }
         
         return links!.filter { link in
             return link.URL != nil
@@ -145,12 +160,18 @@ extension String {
     /**
     Gets an array of dates for all dates found in a String
     
-    :returns: [NSDate]
+    - returns: [NSDate]
     */
     func getDates() -> [NSDate] {
         let error: NSErrorPointer = NSErrorPointer()
-        let detector = NSDataDetector(types: NSTextCheckingType.Date.rawValue, error: error)
-        let dates = detector?.matchesInString(self, options: NSMatchingOptions.WithTransparentBounds, range: NSMakeRange(0, count(self.utf16))) .map {$0 as! NSTextCheckingResult}
+        let detector: NSDataDetector?
+        do {
+            detector = try NSDataDetector(types: NSTextCheckingType.Date.rawValue)
+        } catch let error1 as NSError {
+            error.memory = error1
+            detector = nil
+        }
+        let dates = detector?.matchesInString(self, options: NSMatchingOptions.WithTransparentBounds, range: NSMakeRange(0, self.utf16.count)) .map {$0 }
         
         return dates!.filter { date in
             return date.date != nil
@@ -162,11 +183,16 @@ extension String {
     /**
     Gets an array of strings (hashtags #acme) for all links found in a String
     
-    :returns: [String]
+    - returns: [String]
     */
     func getHashtags() -> [String]? {
-        let hashtagDetector = NSRegularExpression(pattern: "#(\\w+)", options: NSRegularExpressionOptions.CaseInsensitive, error: nil)
-        let results = hashtagDetector?.matchesInString(self, options: NSMatchingOptions.WithoutAnchoringBounds, range: NSMakeRange(0, count(self.utf16))).map { $0 as! NSTextCheckingResult }
+        let hashtagDetector: NSRegularExpression?
+        do {
+            hashtagDetector = try NSRegularExpression(pattern: "#(\\w+)", options: NSRegularExpressionOptions.CaseInsensitive)
+        } catch _ {
+            hashtagDetector = nil
+        }
+        let results = hashtagDetector?.matchesInString(self, options: NSMatchingOptions.WithoutAnchoringBounds, range: NSMakeRange(0, self.utf16.count)).map { $0 }
         
         return results?.map({
             (self as NSString).substringWithRange($0.rangeAtIndex(1))
@@ -176,7 +202,7 @@ extension String {
     /**
     Gets an array of distinct strings (hashtags #acme) for all hashtags found in a String
     
-    :returns: [String]
+    - returns: [String]
     */
     func getUniqueHashtags() -> [String]? {
         return Array(Set(getHashtags()!))
@@ -187,11 +213,16 @@ extension String {
     /**
     Gets an array of strings (mentions @apple) for all mentions found in a String
     
-    :returns: [String]
+    - returns: [String]
     */
     func getMentions() -> [String]? {
-        let hashtagDetector = NSRegularExpression(pattern: "@(\\w+)", options: NSRegularExpressionOptions.CaseInsensitive, error: nil)
-        let results = hashtagDetector?.matchesInString(self, options: NSMatchingOptions.WithoutAnchoringBounds, range: NSMakeRange(0, count(self.utf16))).map { $0 as! NSTextCheckingResult }
+        let hashtagDetector: NSRegularExpression?
+        do {
+            hashtagDetector = try NSRegularExpression(pattern: "@(\\w+)", options: NSRegularExpressionOptions.CaseInsensitive)
+        } catch _ {
+            hashtagDetector = nil
+        }
+        let results = hashtagDetector?.matchesInString(self, options: NSMatchingOptions.WithoutAnchoringBounds, range: NSMakeRange(0, self.utf16.count)).map { $0 }
         
         return results?.map({
             (self as NSString).substringWithRange($0.rangeAtIndex(1))
@@ -201,7 +232,7 @@ extension String {
     /**
     Check if a String contains a Date in it.
     
-    :returns: Bool with true value if it does
+    - returns: Bool with true value if it does
     */
     func getUniqueMentions() -> [String]? {
         return Array(Set(getMentions()!))
@@ -211,7 +242,7 @@ extension String {
     /**
     Check if a String contains a link in it.
     
-    :returns: Bool with true value if it does
+    - returns: Bool with true value if it does
     */
     func containsLink() -> Bool {
         return self.getLinks().count > 0
@@ -220,14 +251,14 @@ extension String {
     /**
     Check if a String contains a date in it.
     
-    :returns: Bool with true value if it does
+    - returns: Bool with true value if it does
     */
     func containsDate() -> Bool {
         return self.getDates().count > 0
     }
     
     /**
-    :returns: Base64 encoded string
+    - returns: Base64 encoded string
     */
     func encodeToBase64Encoding() -> String {
         let utf8str = self.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!
@@ -235,7 +266,7 @@ extension String {
     }
     
     /**
-    :returns: Decoded Base64 string
+    - returns: Decoded Base64 string
     */
     func decodeFromBase64Encoding() -> String {
         /*let base64data = NSData(base64EncodedString: self, options: NSDataBase64DecodingOptions.IgnoreUnknownCharacters)
