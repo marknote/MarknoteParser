@@ -22,7 +22,7 @@ class MarkNoteParserTests: XCTestCase {
     
     func markdown(input :String)->String{
         let result = MarkNoteParser.toHtml(input)
-        println("input: \(input) result:\(result)")
+        print("input: \(input) result:\(result)")
         return result
     }
     

@@ -323,8 +323,7 @@ extension String {
     
     func stringByDecodingURLFormat() ->String {
         return self.stringByReplacingOccurrencesOfString("+", withString: " ", options: NSStringCompareOptions.LiteralSearch, range: nil)
-            .stringByReplacingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
-    
+        .stringByRemovingPercentEncoding!    
     }
     
     func toBool() -> Bool? {
