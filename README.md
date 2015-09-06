@@ -5,8 +5,8 @@ Most of markdown parsers highly depend on regular expression while MarkNote Pars
 
 ## Purpose
 
-Currently my app [MarkNote](https://itunes.apple.com/us/app/marknote/id991297585?ls=1&mt=8) is using [marked](https://github.com/chjj/marked) to render markdown as HTML.   
-After trying to find a relevant markdown parser in Swfit/Object-c while no result, I decided to build my own.
+At the beginning my app [MarkNote](https://itunes.apple.com/us/app/marknote/id991297585?ls=1&mt=8) was using [marked](https://github.com/chjj/marked) to render markdown as HTML.   
+After trying to find a relevant markdown parser in Swfit/Object-c while no luck, I decided to build my own.
 
 
 ## Usage
