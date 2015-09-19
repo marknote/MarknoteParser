@@ -4,7 +4,7 @@
 * https://github.com/marknote/MarknoteParser
 */
 
-import UIKit
+import Foundation
 
 public class MarkNoteParser: NSObject {
     
@@ -76,20 +76,20 @@ public class MarkNoteParser: NSObject {
                     // found
                     if left[endTag - 1] == "/" {
                         //auto close: <XXX />
-                        self.output += left.substringToIndex(advance(left.startIndex, endTag + 1))
+                        self.output += left.substringToIndex(left.startIndex.advancedBy( endTag + 1))
                         if endTag < left.length - 2 {
-                            proceedHTMLTags(left.substringFromIndex(advance(left.startIndex,endTag + 1 )))
+                            proceedHTMLTags(left.substringFromIndex(left.startIndex.advancedBy( endTag + 1 )))
                         }
                     } else {
                         // there is a close tag
                         currentPos = endTag
                         if endTag <= left.length - 1 {
-                            left = left.substringFromIndex(advance(left.startIndex,endTag + 1 ))
+                            left = left.substringFromIndex(left.startIndex.advancedBy( endTag + 1 ))
                             endTag = left.indexOf(">")
                             if endTag > 0 {
                                 self.output += input.substring(tagBegin, end: tagBegin + endTag + currentPos + 1) //+ left.substringToIndex(advance(left.startIndex,endTag ))
                                 if endTag < left.length - 1 {
-                                    left = left.substringFromIndex(advance(left.startIndex,endTag + 1 ))
+                                    left = left.substringFromIndex(left.startIndex.advancedBy( endTag + 1 ))
                                     proceedHTMLTags(left)
                                     return
                                 }
@@ -178,7 +178,7 @@ public class MarkNoteParser: NSObject {
                     var cssClass = "no-highlight"
                     if line.length > "```".length {
                         //prettyprint javascript prettyprinted
-                        let remaining = line.substringFromIndex(advance(line.startIndex, "```".length))
+                        let remaining = line.substringFromIndex(line.startIndex.advancedBy(  "```".length))
                         cssClass = "prettyprint lang-\(remaining)"
                     }
                     output += "<pre class=\"\(cssClass)\">\n"
@@ -211,7 +211,7 @@ public class MarkNoteParser: NSObject {
                 handleLine(line)
                 if  isCurrentLineNeedBr
                     && lines[i].length >= 2
-                    && lines[i].substringFromIndex(advance(lines[i].startIndex, lines[i].length - 2)) == "  " {
+                    && lines[i].substringFromIndex(lines[i].startIndex.advancedBy( lines[i].length - 2)) == "  " {
                         output += "<br/>"
                 }
                 
@@ -296,7 +296,7 @@ public class MarkNoteParser: NSObject {
         var nFindHead = 0
         var pos: String.Index = line.startIndex
         for var i = 0; i <= 6 && i < line.characters.count; i++ {
-            pos = advance(line.startIndex,i)
+            pos = line.startIndex.advancedBy( i)
             if line[pos] == headerChar  {
                 nFindHead = i + 1
             } else {
@@ -322,7 +322,7 @@ public class MarkNoteParser: NSObject {
         
         if line[0] == ">" {
             output += "<blockquote>"
-            line = line.substringFromIndex(advance(line.startIndex,">".length))
+            line = line.substringFromIndex(line.startIndex.advancedBy( ">".length))
             endTags.append("</blockquote>")
         }
         
@@ -332,7 +332,7 @@ public class MarkNoteParser: NSObject {
 
             output  += "<h\(nFindHead)>"
             endTags.append("</h\(nFindHead)>")
-            pos = advance(pos, nFindHead)
+            pos = pos.advancedBy(  nFindHead)
         } else {
             beginParagraph()
         }
@@ -355,7 +355,7 @@ public class MarkNoteParser: NSObject {
         let len = line.length
         let start = line.startIndex
         for var i = 0; i < len ; i++ {
-            let ch:Character = line[advance(start, i)]
+            let ch:Character = line[start.advancedBy(  i)]
             
             switch ch {
             case "*","_","~":
@@ -367,26 +367,26 @@ public class MarkNoteParser: NSObject {
                 if ch == "~" {
                     strong = "del"
                 }
-                if line[advance(start, i + 1)] == ch {
+                if line[start.advancedBy(  i + 1)] == ch {
                     //possible **
-                    let remaining = line.substringFromIndex(advance(start, i + 2))
+                    let remaining = line.substringFromIndex(start.advancedBy(  i + 2))
                     i += scanClosedChar(MarkNoteParser.charArray(ch, len: 2),inStr: remaining,tag: strong) + 1
                 } else {
-                    let remaining = line.substringFromIndex(advance(start, i + 1))
+                    let remaining = line.substringFromIndex(start.advancedBy(  i + 1))
                     i += scanClosedChar("\(ch)",inStr: remaining,tag: "em")
                 }
             case "`":
-                let remaining = line.substringFromIndex(advance(start, i + 1))
+                let remaining = line.substringFromIndex(start.advancedBy(  i + 1))
                 i += scanClosedChar("`",inStr: remaining,tag: "code")
                 isCurrentLineNeedBr = false
 
             case "!":
-                if i >= line.length - 1 || line[advance(start, i + 1)] != "[" {
+                if i >= line.length - 1 || line[start.advancedBy(  i + 1)] != "[" {
                     output.append(ch)
                     continue
                 }
                 i++
-                let remaining = line.substringFromIndex(advance(start, i + 1))
+                let remaining = line.substringFromIndex(start.advancedBy(  i + 1))
                 let posArray = MarkNoteParser.detectPositions(["]","(",")"],inStr: remaining)
                 if posArray.count == 3 {
                     let img = ImageTag()
@@ -413,7 +413,7 @@ public class MarkNoteParser: NSObject {
                     }
                 
             case "[":
-                let remaining = line.substringFromIndex(advance(start, i + 1))
+                let remaining = line.substringFromIndex(start.advancedBy(  i + 1))
                 let posArray = MarkNoteParser.detectPositions(["]","(",")"],inStr: remaining)
                 if posArray.count == 3 {
                     let link = LinkTag()
@@ -427,8 +427,8 @@ public class MarkNoteParser: NSObject {
                     if pos > 0 && pos < remaining.length - "]:".length {
                         // is reference definition
                         let info = ReferenceDefinition()
-                        info.key = remaining.substringToIndex(advance(remaining.startIndex,pos ))
-                        let remaining2 = remaining.substringFromIndex(advance(remaining.startIndex,pos + "]:".length ))
+                        info.key = remaining.substringToIndex(remaining.startIndex.advancedBy( pos ))
+                        let remaining2 = remaining.substringFromIndex(remaining.startIndex.advancedBy( pos + "]:".length ))
                         info.url = URLTag(url: remaining2)
                         self.arrReferenceInfo.append(info)
                         i += pos + "]:".length + remaining2.length
@@ -470,7 +470,7 @@ public class MarkNoteParser: NSObject {
         let count = toFind.count
         var lastPos = 0
         for var i = 0; i < count ; i++ {
-            let pos = inStr.substringFromIndex(advance(inStr.startIndex, lastPos)).indexOf(toFind[i])
+            let pos = inStr.substringFromIndex(inStr.startIndex.advancedBy(  lastPos)).indexOf(toFind[i])
             lastPos += pos 
             if pos >= 0 {
                 posArray.append(lastPos)
@@ -484,7 +484,7 @@ public class MarkNoteParser: NSObject {
     func  scanClosedChar(ch:String, inStr:String,tag:String) -> Int {
         let pos = inStr.indexOf(ch)
         if pos > 0 {
-            output += "<\(tag)>" + inStr.substringToIndex(advance(inStr.startIndex,  pos )) + "</\(tag)>"
+            output += "<\(tag)>" + inStr.substringToIndex(inStr.startIndex.advancedBy(   pos )) + "</\(tag)>"
         } else {
             output += ch
         }
@@ -495,8 +495,8 @@ public class MarkNoteParser: NSObject {
         let trimmed = input.trim()
         let pos = trimmed.indexOf(" ")
         if pos > 0 {
-            array.append(trimmed.substringToIndex(advance(trimmed.startIndex, pos)))
-            array.append(trimmed.substringFromIndex(advance(trimmed.startIndex, pos + 1)))
+            array.append(trimmed.substringToIndex(trimmed.startIndex.advancedBy( pos)))
+            array.append(trimmed.substringFromIndex(trimmed.startIndex.advancedBy( pos + 1)))
         } else {
             array.append(trimmed)
         }
