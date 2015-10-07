@@ -1,6 +1,11 @@
-# MarkNote Parser
+# MarkNote Parser 
 
-A dead simple markdown parser implemented in Swift with performance in mind, which can help you to transform markdown code into HTML.    
+
+Objective-C version: https://github.com/marknote/MarkNoteParserObjC
+Swift version: https://github.com/marknote/MarknoteParser
+
+
+A dead simple markdown parser implemented in both **Swift** and **Objective-C** with performance in mind, which can help you to transform markdown code into HTML.    
 Most of markdown parsers highly depend on regular expression while MarkNote Parser avoids doing so.
 
 ## Purpose
@@ -11,6 +16,7 @@ After trying to find a relevant markdown parser in Swfit/Object-c while no luck,
 
 ## Usage
 
+### Using swift version
 - Cope 2 files into your project:  
 -- **StringExtensions.swift** , extension of String class;  
 -- **MarkNoteParser.swift**, the parser class;  
@@ -23,6 +29,18 @@ func markdown(input :String)->String{
         println("input: \(input) result:\(result)")
         return result
     }
+```
+### Using objetive-c version
+- Cope all files under "MarkNoteParserOC" folder into your project, and import the header file like this
+
+```objective-c
+#import "MarkNoteParser.h"
+```
+- Then you can call MarkNoteParser to parse your markdown document:
+
+```objective-c
+NSString* result = [MarkNoteParser toHtml:input];
+return result;
 ```
 
 ## Features 
